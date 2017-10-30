@@ -33,7 +33,7 @@ namespace assignment2 {
 	int driver(int argc, char **argv) {
 		FUNC_LOG;
 		//ensure correct args
-		ASSERT(3 == argc);
+		ASSERT(2 == argc);
 		const char* test_file = argv[1];
 
 		//setup all displayable images
@@ -75,6 +75,7 @@ namespace assignment2 {
 			}
 			{
 				mask m = mask::makeLOG(11, 5.0);
+				std::cout << m.toString() << std::endl;
 				Log11Grid.multiply(m);
 			}
 		}

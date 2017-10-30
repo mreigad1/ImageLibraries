@@ -40,7 +40,7 @@ PrecisionType mask::LOG(PrecisionType x, PrecisionType y, PrecisionType sigma) {
 	PrecisionType sig4 = sig2 * sig2;
 	PrecisionType x2 = x * x;
 	PrecisionType y2 = y * y;
-	PrecisionType term1 = (-1.0 / (PI * sig4));
+	PrecisionType term1 = (1.0 / (PI * sig4));
 	PrecisionType f_xy = ((x2 + y2) / (2.0 * sig2));
 	PrecisionType term2 = 1 - f_xy;
 	PrecisionType term3 = pow(EPS, -f_xy);
@@ -60,6 +60,7 @@ mask mask::makeLOG(int width, PrecisionType sigma) {
 	// -2 to +2, ie: -2, -1, 0, +1, +2 and feed those into the formula.
 	int min = -(width / 2);
 	int max = (width / 2);
+	PrecisionType scale = 1;
 
 	// We also need a count to index into the data array...
 	int lCount = 0;
@@ -67,11 +68,11 @@ mask mask::makeLOG(int width, PrecisionType sigma) {
 	for(int y = min; y <= max; ++y) {
 		for(int x = min; x <= max; ++x) {
 			// Get the LoG value for this (x,y) pair
-			list[0][lCount++] = LOG(x, y, sigma) * scaleFactor;
+			list[0][lCount++] = LOG(x/scale, y/scale, sigma) * scaleFactor;
 		}
 	}
 
-	mask retVal(width,list[0]);
+	mask retVal(width,list[0],10.0);
 	return retVal;
 }
 

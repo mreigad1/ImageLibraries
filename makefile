@@ -77,19 +77,21 @@ HistogramTest: build_dir move_tests
 Assignment1_Part2: build_dir move_Assignment1
 	g++ $(BUILD_DIR)/assignment1_part2.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment1_Part2
 	./$(TEST_DIR)/Assignment1_Part2 $(ASSETS_DIR)/shapes.bmp $(ASSETS_DIR)/hitchhikers.bmp
+	#./$(TEST_DIR)/Assignment1_Part2 $(ASSETS_DIR)/doge.jpg $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment1_Part2
 
 Assignment1_Part1: build_dir move_Assignment1
 	g++ $(BUILD_DIR)/assignment1_part1.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment1_Part1
 	./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/darkNight.bmp $(ASSETS_DIR)/darkNight.bmp
 	./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/brightNYC.bmp $(ASSETS_DIR)/brightNYC.bmp
+	#./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/doge.jpg $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment1_Part1
 
 Assignment2_Part1: build_dir move_Assignment2
 	g++ $(BUILD_DIR)/assignment2.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment2
-	#./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/doge.jpg $(ASSETS_DIR)/doge.jpg
-	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/input.tif $(ASSETS_DIR)/rainbow.png
-	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/darkNight.bmp $(ASSETS_DIR)/darkNight.bmp
+	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/basel_gray.bmp
+	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/ant_gray.bmp
+	#./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment1_Part1
 
 move_tests:
