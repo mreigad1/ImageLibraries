@@ -48,6 +48,7 @@ namespace RGBPix {
 			arithmeticalRGB unlux() const;										//unluxing algorithm
 			arithmeticalRGB continuousLux(double p) const;						//continuous luxing algorithm
 			arithmeticalRGB root() const;										//square root of pixel primitive
+			bool operator==(const pixelRGB& m) const;							//equal comparison for pixel primitives
 			bool operator<=(const pixelRGB& m) const;							//less than equal comparison for pixel primitives
 			bool operator<(const pixelRGB& m) const;							//strict less than comparison for pixel primitives
 			bool operator>=(const pixelRGB& m) const;							//greater than equal for pixel primitives
@@ -61,5 +62,10 @@ namespace RGBPix {
 			byte R() const;
 			byte G() const;
 			byte B() const;
+
+			//cast operators
+			operator arithmeticalRGB() const;									//allow implicit conversion to arithmeticalRGB
+			explicit operator HSIPix::arithmeticalHSI() const;					//only allow explicit conversion to other pixel types
+			explicit operator GreyscalePix::arithmeticalGreyscale() const;
 	};
 };

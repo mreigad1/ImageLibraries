@@ -1,6 +1,10 @@
 #include "debug.hpp"
 #include "constants.hpp"
 #include "pixelHSI.h"
+#include "arithmeticalRGB.h"
+#include "arithmeticalHSI.h"
+#include "arithmeticalGreyscale.h"
+#include <math.h>
 
 namespace HSIPix {
 	//empty constructor
@@ -9,7 +13,7 @@ namespace HSIPix {
 	}
 
 	//explicit constructor
-	pixelHSI::pixelHSI(byte h, byte s, byte i) :
+	pixelHSI::pixelHSI(PrecisionType h, PrecisionType s, PrecisionType i) :
 		pixel<pixelHSI>() {
 			hsi.m_h = h;
 			hsi.m_s = s;
@@ -26,15 +30,17 @@ namespace HSIPix {
 	
 	//downcast constructor
 	pixelHSI::pixelHSI(const arithmeticalHSI& other) {
-		(*this) = other.toPixelHSI();
+		hsi.m_h = other.H();
+		hsi.m_s = other.S();
+		hsi.m_i = other.I();
 	}
 
 	//toString method
 	std::string pixelHSI::toString() const {
 		std::string retVal = "{"
-		+ std::to_string((int)hsi.m_h.value()) + ", "
-		+ std::to_string((int)hsi.m_s.value()) + ", "
-		+ std::to_string((int)hsi.m_i.value()) + "}";
+		+ std::to_string(hsi.m_h.value()) + ", "
+		+ std::to_string(hsi.m_s.value()) + ", "
+		+ std::to_string(hsi.m_i.value()) + "}";
 		return retVal;
 	}
 
@@ -48,7 +54,9 @@ namespace HSIPix {
 
 	//downcast assignment
 	pixelHSI& pixelHSI::operator=(const arithmeticalHSI& other) {
-		(*this) = other.toPixelHSI();
+		hsi.m_h = other.H();
+		hsi.m_s = other.S();
+		hsi.m_i = other.I();
 		return *this;
 	}
 
@@ -119,6 +127,15 @@ namespace HSIPix {
 		return arithmeticalHSI(*this) * scalar;
 	}
 
+	//greater than equal for pixel primitives
+	bool pixelHSI::operator==(const pixelHSI& m) const {
+		bool rv = true;
+		rv = rv && (H() == m.H());
+		rv = rv && (S() == m.S());
+		rv = rv && (I() == m.I());
+		return rv;
+	}
+
 	//less than equal comparison for pixel primitives
 	bool pixelHSI::operator<=(const pixelHSI& m) const {
 		return getAvgIntensity() <= m.getAvgIntensity();
@@ -168,82 +185,31 @@ namespace HSIPix {
 
 	//get pixel as greyscale
 	pixelHSI pixelHSI::toGrey() const {
-		byte greyLevel = getAvgIntensity();
-		return pixelHSI(greyLevel, greyLevel, greyLevel);
+		return pixelHSI(0, 0, I());
 	}
 
 	//get average brightness
-	byte pixelHSI::getAvgIntensity() const {
-		int retVal = 0;
-		retVal += hsi.m_h.value();
-		retVal += hsi.m_s.value();
-		retVal += hsi.m_i.value();
-		retVal += 1; //this allows round up for /3
-		retVal = retVal / 3;
-		retVal = (retVal > 0xFF) ? 0xFF : retVal;
-		retVal = (retVal < 0)    ? 0x00 : retVal;
-		return (unsigned char)retVal;
+	PrecisionType pixelHSI::getAvgIntensity() const {
+		return I();
 	}
 
 	//get binary thresholded pixel
 	pixelHSI pixelHSI::toNegative() const {
-		pixelHSI retVal(MAX_BYTE - hsi.m_h.value(), MAX_BYTE - hsi.m_s.value(), MAX_BYTE - hsi.m_i.value());
-		return retVal;
+		RGBPix::arithmeticalRGB tmp = static_cast<RGBPix::arithmeticalRGB>(*this);
+		RGBPix::arithmeticalRGB rvTmp(MAX_BYTE - tmp.R(), MAX_BYTE - tmp.G(), MAX_BYTE - tmp.B());
+		pixelHSI rv = static_cast<arithmeticalHSI>(rv);
+		return rv;
 	}
 
 	//greyscale histogram shift
 	pixelHSI pixelHSI::histogramShift(unsigned int average) const {
-		byte retGreyVal = getAvgIntensity();
-		float midPoint = MAX_BYTE / 2;
-		const unsigned int trivialCases[] = { 0, (unsigned int)midPoint, MAX_BYTE };
-
-		//loop handles error cases of 0, 255, and trivial case of already greyscale balanced
-		for (unsigned int index = 0; index < sizeof(trivialCases)/sizeof(unsigned int); index++) {
-			if (trivialCases[index] == average) {
-				return pixelHSI(retGreyVal, retGreyVal, retGreyVal);
-			}
-		}
-
-		float newValue = retGreyVal;
-		if (1 > newValue) {
-			newValue = 1;
-		}
-
-		//linear transform of number line for intensities
-		if (newValue < average) {
-			newValue = newValue * midPoint / average;
-		} else if (newValue > average) {
-			newValue = ((newValue - average) * (midPoint / (MAX_BYTE - average))) + midPoint;
-		}
-		retGreyVal = (byte)newValue;
-		return pixelHSI(retGreyVal, retGreyVal, retGreyVal);
+		TBI;
+		return (*this);
 	}
 
 	pixelHSI pixelHSI::coordHash(unsigned int x, unsigned int y) const {
-		x = x & 0x0FFF;
-		y = y & 0x0FFF;
-		unsigned int buf = 0;
-		const int spins = 3;
-		for (int index_j = 0; index_j < spins; index_j++) {
-			for (int index = 0; index < 12; index++) {
-				buf = (buf | (x & 1)) << 1;
-				buf = (buf | (y & 1)) << 1;
-				x = x >> 1;
-				y = y >> 1;
-			}
-			buf = buf >> 1;
-			if (index_j != (spins - 1)) {
-				x = buf & 0x0FFF;
-				y = (buf >> 12) & 0x0FFF;
-				buf = 0;
-			}
-		}
-		byte h = buf & 0xFF;
-		buf = buf >> 8;
-		byte s = buf & 0xFF;
-		buf = buf >> 8;
-		byte i = buf & 0xFF;
-		return pixelHSI(h, s, i);
+		TBI;
+		return (*this);
 	}
 
 	//get binary thresholded pixel
@@ -252,15 +218,82 @@ namespace HSIPix {
 		return pixelHSI(newVal, newVal, newVal);
 	}
 
-	byte pixelHSI::H() const {
+	PrecisionType pixelHSI::H() const {
 		return hsi.m_h.value();
 	}
 
-	byte pixelHSI::S() const {
+	PrecisionType pixelHSI::S() const {
 		return hsi.m_s.value();
 	}
 
-	byte pixelHSI::I() const {
+	PrecisionType pixelHSI::I() const {
 		return hsi.m_i.value();
+	}
+
+	pixelHSI::operator HSIPix::arithmeticalHSI() const {
+		return HSIPix::arithmeticalHSI(H(), S(), I());
+	}
+
+	template<typename T>
+	T min(T x, T y) {
+		return (x < y ? x : y);
+	}
+
+	template<typename T>
+	T max(T x, T y) {
+		return (x > y ? x : y);
+	}
+
+	pixelHSI::operator RGBPix::arithmeticalRGB() const {
+		PrecisionType r, g, b;
+		PrecisionType h = H();
+		PrecisionType s = S();
+		PrecisionType i = I();
+
+		s = max(s, static_cast<PrecisionType>(0.0));
+		i = max(i, static_cast<PrecisionType>(0.0));
+		s = min(s, static_cast<PrecisionType>(1.0));
+		i = min(i, static_cast<PrecisionType>(1.0));
+		if (s == 0) {
+			r = g = b = i;
+		} else {
+			ASSERT(h >= 0 && h <= tPI);
+			int caseNum = (h / tPI) * 3;
+
+			h -= (caseNum * (tPI / 3));
+			PrecisionType x, y, z;
+
+			x = (1 - s);
+			y = (1 + (s * cos(h) / cos(PI / 3 - h)));
+			z = (3 - x - y);
+
+			switch (caseNum) {
+				case 0:
+					b = x;
+					r = y;
+					g = z;
+				break;
+				case 1:
+					r = x;
+					g = y;
+					b = z;
+				break;
+				case 2:
+					g = x;
+					b = y;
+					r = z;
+				break;
+				default:
+					ASSERT("Error converting HSI to RGB" == false);
+				break;
+			}
+		}
+
+		PrecisionType c = i * MAX_BYTE;
+		return RGBPix::arithmeticalRGB(r*c, g*c, b*c);
+	}
+
+	pixelHSI::operator GreyscalePix::arithmeticalGreyscale() const {
+		return GreyscalePix::arithmeticalGreyscale(I() * MAX_BYTE);
 	}
 };

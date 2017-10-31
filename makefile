@@ -55,14 +55,40 @@ ByteIntensityTest: build_dir move_tests
 	rm $(TEST_DIR)/ByteIntensityTest
 
 PixelRGBTest: build_dir move_tests
-	g++ $(BUILD_DIR)/PixelRGBTest.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelRGBTest
+	g++ $(BUILD_DIR)/PixelRGBTest.cpp                                          \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelRGBTest
 	./$(TEST_DIR)/PixelRGBTest
 	rm $(TEST_DIR)/PixelRGBTest
 
 PixelHSITest: build_dir move_tests
-	g++ $(BUILD_DIR)/PixelHSITest.cpp $(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp $(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
+	g++ $(BUILD_DIR)/PixelHSITest.cpp                                          \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
 	./$(TEST_DIR)/PixelHSITest
 	rm $(TEST_DIR)/PixelHSITest
+
+PixelGreyscaleTest: build_dir move_tests
+	g++ $(BUILD_DIR)/PixelGreyscaleTest.cpp                                    \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
+	./$(TEST_DIR)/PixelHSITest
+	rm $(TEST_DIR)/PixelHSITest
+
+PixelConversionTest: build_dir move_tests
+	g++ $(BUILD_DIR)/PixelConversionTest.cpp                                   \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelConversionTest
+	./$(TEST_DIR)/PixelConversionTest
+	rm $(TEST_DIR)/PixelConversionTest
 
 MaskTest: build_dir move_tests
 	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -std=c++11 -o $(TEST_DIR)/MaskTest

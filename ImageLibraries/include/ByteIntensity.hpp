@@ -76,6 +76,10 @@ template <ColorIndex Value> class ByteIntensity {
 			return ArithmeticalIntensity<Value>(value()) / brightness;
 		}
 
+		bool operator==(const ByteIntensity<Value> other) const {
+			return intensity == other.intensity;
+		}
+
 		ArithmeticalIntensity<Value> operator+(const ByteIntensity<Value> other) const {
 			return ArithmeticalIntensity<Value>(value()) + ArithmeticalIntensity<Value>(other.value());
 		}

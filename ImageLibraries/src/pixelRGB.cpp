@@ -1,6 +1,10 @@
 #include "debug.hpp"
 #include "constants.hpp"
 #include "pixelRGB.h"
+#include "arithmeticalRGB.h"
+#include "arithmeticalHSI.h"
+#include "arithmeticalGreyscale.h"
+#include <math.h>
 
 namespace RGBPix {
 	//empty constructor
@@ -26,7 +30,9 @@ namespace RGBPix {
 	
 	//downcast constructor
 	pixelRGB::pixelRGB(const arithmeticalRGB& other) {
-		(*this) = other.toPixelRGB();
+		rgb.m_r = other.R();
+		rgb.m_g = other.G();
+		rgb.m_b = other.B();
 	}
 
 	//toString method
@@ -48,7 +54,9 @@ namespace RGBPix {
 
 	//downcast assignment
 	pixelRGB& pixelRGB::operator=(const arithmeticalRGB& other) {
-		(*this) = other.toPixelRGB();
+		rgb.m_r = other.R();
+		rgb.m_g = other.G();
+		rgb.m_b = other.B();
 		return *this;
 	}
 
@@ -137,6 +145,15 @@ namespace RGBPix {
 	//strict greater than for pixel primitives
 	bool pixelRGB::operator>(const pixelRGB& m) const {
 		return getAvgIntensity() > m.getAvgIntensity();
+	}
+
+	//greater than equal for pixel primitives
+	bool pixelRGB::operator==(const pixelRGB& m) const {
+		bool rv = true;
+		rv = rv && (rgb.m_r == m.rgb.m_r);
+		rv = rv && (rgb.m_g == m.rgb.m_g);
+		rv = rv && (rgb.m_b == m.rgb.m_b);
+		return rv;
 	}
 
 	//luxing algorithm
@@ -264,4 +281,45 @@ namespace RGBPix {
 		return rgb.m_b.value();
 	}
 
+	pixelRGB::operator RGBPix::arithmeticalRGB() const {
+		return RGBPix::arithmeticalRGB(R(), G(), B());
+	}
+
+	template<typename T>
+	T min(T x, T y) {
+		return (x < y ? x : y);
+	}
+
+	template<typename T>
+	T max(T x, T y) {
+		return (x > y ? x : y);
+	}
+
+	pixelRGB::operator HSIPix::arithmeticalHSI() const {
+
+		PrecisionType H, S, I;
+		PrecisionType r = static_cast<PrecisionType>(R()) / MAX_BYTE;	//intervals [0, 1]
+		PrecisionType g = static_cast<PrecisionType>(G()) / MAX_BYTE;
+		PrecisionType b = static_cast<PrecisionType>(B()) / MAX_BYTE;
+		PrecisionType rn = r / (r + g + b);								//intervals [0, (1/3)]
+		PrecisionType gn = g / (r + g + b);
+		PrecisionType bn = b / (r + g + b);
+
+		H = acos((0.5 * ((rn - gn) + (rn - bn))) / (sqrt((rn - gn) * (rn - gn) + (rn - bn) * (gn - bn))));
+		S = 1 - 3.0 * min(rn, min(gn, bn));
+		I = ( r + g + b ) / 3.0;
+
+		S = max(S, static_cast<PrecisionType>(0.0));
+		I = max(I, static_cast<PrecisionType>(0.0));
+		S = min(S, static_cast<PrecisionType>(1.0));
+		I = min(I, static_cast<PrecisionType>(1.0));
+		if (H != H)     H = 0;       //handle NaN case
+		if (b > r)      H = tPI - H; //Reflect if g > b
+
+		return HSIPix::arithmeticalHSI(H, S, I);
+	}
+
+	pixelRGB::operator GreyscalePix::arithmeticalGreyscale() const {
+		return GreyscalePix::arithmeticalGreyscale(getAvgIntensity());
+	}
 };

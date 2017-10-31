@@ -1,11 +1,11 @@
 #include "debug.hpp"
-#include "pixelRGB.h"
-namespace PixelRGBTest {
+#include "pixelHSI.h"
+namespace PixelHSITest {
 	int driver() {
-		RGBPix::pixelRGB pix1;
-		RGBPix::pixelRGB pix2(0x10, 0xFF, 0x00);
-		RGBPix::pixelRGB pix3(pix2);
-		RGBPix::pixelRGB pix4(0x20, 0x20, 0x20);
+		HSIPix::pixelHSI pix1;
+		HSIPix::pixelHSI pix2(0x10, 0xFF, 0x00);
+		HSIPix::pixelHSI pix3(pix2);
+		HSIPix::pixelHSI pix4(0x20, 0x20, 0x20);
 		pix1 = pix3;
 
 		ASSERT(pix2 <= pix2);
@@ -40,8 +40,8 @@ namespace PixelRGBTest {
 };
 int main() {
 	int retVal = 0;
-	std::cout << "Starting PixelRGBTest|";
-	retVal = PixelRGBTest::driver();
-	std::cout << "Finished PixelRGBTest\n";
+	std::cout << "Starting PixelHSITest|";
+	retVal = PixelHSITest::driver();
+	std::cout << "Finished PixelHSITest\n";
 	return retVal;
 }

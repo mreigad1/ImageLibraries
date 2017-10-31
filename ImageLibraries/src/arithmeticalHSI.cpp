@@ -7,29 +7,16 @@ namespace HSIPix {
 	arithmeticalHSI::arithmeticalHSI() {
 	}
 
-	arithmeticalHSI::arithmeticalHSI(byte h, byte s, byte i) {
+	arithmeticalHSI::arithmeticalHSI(PrecisionType h, PrecisionType s, PrecisionType i) {
 		hsi.m_h = h;
 		hsi.m_s = s;
 		hsi.m_i = i;
-	}
-
-	arithmeticalHSI::arithmeticalHSI(const pixelHSI& other) {
-		hsi.m_h = other.H();
-		hsi.m_s = other.S();
-		hsi.m_i = other.I();
 	}
 
 	arithmeticalHSI::arithmeticalHSI(const arithmeticalHSI& other) {
 		hsi.m_h = other.hsi.m_h;
 		hsi.m_s = other.hsi.m_s;
 		hsi.m_i = other.hsi.m_i;
-	}
-
-	arithmeticalHSI& arithmeticalHSI::operator=(const pixelHSI& other) {
-		hsi.m_h = other.H();
-		hsi.m_s = other.S();
-		hsi.m_i = other.I();
-		return *this;
 	}
 
 	arithmeticalHSI& arithmeticalHSI::operator=(const arithmeticalHSI& other) {
@@ -51,54 +38,11 @@ namespace HSIPix {
 		return hsi.m_i.value();
 	}
 
-	pixelHSI arithmeticalHSI::toPixelHSI() const {
-		byte h,s,i;
-		h = static_cast<ByteIntensity<ind_r>>(hsi.m_h).value();
-		s = static_cast<ByteIntensity<ind_g>>(hsi.m_s).value();
-		i = static_cast<ByteIntensity<ind_b>>(hsi.m_i).value();
-		return pixelHSI(h,s,i);
-	}
-
 	//return stringified object
 	std::string arithmeticalHSI::toString() const {
 		std::stringstream rv;
 		rv << "[" << hsi.m_h.value() << "|" << hsi.m_s.value() << "|" << hsi.m_i.value() << "]\n";
 		std::string retVal = rv.str();
-		return retVal;
-	}
-
-	arithmeticalHSI arithmeticalHSI::operator+(const pixelHSI& neighbor) const {
-		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h + neighbor.H();
-		retVal.hsi.m_s = retVal.hsi.m_s + neighbor.S();
-		retVal.hsi.m_i = retVal.hsi.m_i + neighbor.I();
-		return retVal;
-	}
-
-	arithmeticalHSI arithmeticalHSI::operator-(const pixelHSI& neighbor) const {
-		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h - neighbor.H();
-		retVal.hsi.m_s = retVal.hsi.m_s - neighbor.S();
-		retVal.hsi.m_i = retVal.hsi.m_i - neighbor.I();
-		return retVal;
-	}
-
-	arithmeticalHSI arithmeticalHSI::operator/(const pixelHSI& neighbor) const {
-		ASSERT(0 != neighbor.H());
-		ASSERT(0 != neighbor.S());
-		ASSERT(0 != neighbor.I());
-		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h / neighbor.H();
-		retVal.hsi.m_s = retVal.hsi.m_s / neighbor.S();
-		retVal.hsi.m_i = retVal.hsi.m_i / neighbor.I();
-		return retVal;
-	}
-
-	arithmeticalHSI arithmeticalHSI::operator*(const pixelHSI& neighbor) const {
-		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h * neighbor.H();
-		retVal.hsi.m_s = retVal.hsi.m_s * neighbor.S();
-		retVal.hsi.m_i = retVal.hsi.m_i * neighbor.I();
 		return retVal;
 	}
 

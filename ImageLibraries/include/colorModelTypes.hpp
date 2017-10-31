@@ -6,9 +6,9 @@ typedef ByteIntensity<ind_grey>  BI_grey;
 typedef ByteIntensity<ind_r>     BI_r;
 typedef ByteIntensity<ind_g>     BI_g;
 typedef ByteIntensity<ind_b>     BI_b;
-typedef ByteIntensity<ind_h>     BI_h;
-typedef ByteIntensity<ind_s>     BI_s;
-typedef ByteIntensity<ind_i>     BI_i;
+//typedef ByteIntensity<ind_h>     BI_h;
+//typedef ByteIntensity<ind_s>     BI_s;
+//typedef ByteIntensity<ind_i>     BI_i;
 typedef ByteIntensity<ind_y>     BI_y;
 typedef ByteIntensity<ind_u>     BI_u;
 typedef ByteIntensity<ind_v>     BI_v;
@@ -24,6 +24,12 @@ typedef ArithmeticalIntensity<ind_y>     AI_y;
 typedef ArithmeticalIntensity<ind_u>     AI_u;
 typedef ArithmeticalIntensity<ind_v>     AI_v;
 
-class arithmeticalRGB;
-class arithmeticalHSI;
-class arithmeticalYUV;
+namespace GreyscalePix {
+	class arithmeticalGreyscale;
+};
+namespace RGBPix {
+	class arithmeticalRGB;
+};
+namespace HSIPix {
+	class arithmeticalHSI;
+};

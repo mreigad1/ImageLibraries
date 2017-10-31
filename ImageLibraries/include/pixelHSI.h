@@ -13,10 +13,11 @@ namespace HSIPix {
 	const int numColors = 3;
 
 	//array type
+	//HSI innately uses float types
 	struct HSI {
-		BI_h m_h;
-		BI_s m_s;
-		BI_i m_i;
+		AI_h m_h;
+		AI_s m_s;
+		AI_i m_i;
 	};
 
 	class pixelHSI : public pixel<pixelHSI> {
@@ -24,7 +25,7 @@ namespace HSIPix {
 			HSI hsi;
 		public:
 			pixelHSI();															//empty constructor
-			pixelHSI(byte h, byte s, byte i);									//explicit constructor
+			pixelHSI(PrecisionType h, PrecisionType s, PrecisionType i);									//explicit constructor
 			pixelHSI(const pixelHSI& other);									//const constructor
 			pixelHSI(const arithmeticalHSI& other);								//downcast constructor
 			std::string toString() const;										//toString
@@ -46,6 +47,7 @@ namespace HSIPix {
 			arithmeticalHSI unlux() const;										//unluxing algorithm
 			arithmeticalHSI continuousLux(double p) const;						//continuous luxing algorithm
 			arithmeticalHSI root() const;										//square root of pixel primitive
+			bool operator==(const pixelHSI& m) const;							//equal comparison for pixel primitives
 			bool operator<=(const pixelHSI& m) const;							//less than equal comparison for pixel primitives
 			bool operator<(const pixelHSI& m) const;							//strict less than comparison for pixel primitives
 			bool operator>=(const pixelHSI& m) const;							//greater than equal for pixel primitives
@@ -54,10 +56,15 @@ namespace HSIPix {
 			pixelHSI coordHash(unsigned int x, unsigned int y) const;			//pixel color based on position
 			pixelHSI histogramShift(unsigned int average) const;				//greyscale histogram shift
 			pixelHSI toNegative() const;										//greyscale pixel transformation
-			byte getAvgIntensity() const;										//get average brightness
+			PrecisionType getAvgIntensity() const;								//get average brightness
 			pixelHSI toBinary(pixelHSI thresh) const;							//get binary thresholded pixel
-			byte H() const;
-			byte S() const;
-			byte I() const;
+			PrecisionType H() const;
+			PrecisionType S() const;
+			PrecisionType I() const;
+
+			//cast operators
+			operator arithmeticalHSI() const;									//allow implicit conversion to arithmeticalHSI
+			explicit operator RGBPix::arithmeticalRGB() const;					//only allow explicit conversion to other pixel types
+			explicit operator GreyscalePix::arithmeticalGreyscale() const;
 	};
 };
