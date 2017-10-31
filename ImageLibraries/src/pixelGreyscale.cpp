@@ -211,7 +211,7 @@ namespace GreyscalePix {
 	}
 
 	pixelGreyscale::operator HSIPix::arithmeticalHSI() const {
-		return HSIPix::arithmeticalHSI(0, 0, I());
+		return HSIPix::arithmeticalHSI(0, 0, static_cast<PrecisionType>(I()) / MAX_BYTE);
 	}
 
 	pixelGreyscale::operator RGBPix::arithmeticalRGB() const {

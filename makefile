@@ -14,7 +14,7 @@ CVOPTIONS=${INCLUDE_PATHS} ${LIB_PATHS} ${LIBS}
 BUILD_DIR=build
 TEST_DIR=test
 ASSETS_DIR=ImageLibraries/assets
-BUILD_FLAGS=-Wall -Wfatal-errors -Werror
+BUILD_FLAGS=-Wall -Wfatal-errors -Werror -std=c++11
 
 all: main
 
@@ -33,7 +33,10 @@ Assignment2:	Assignment2_Part1	\
 perform_test: 	debugTest			\
 				Array2DTest			\
 				ByteIntensityTest	\
+				PixelGreyscaleTest	\
 				PixelRGBTest		\
+				PixelHSITest		\
+				PixelConversionTest	\
 				MaskTest			\
 				ImageGridTest		\
 				HistogramTest		\
@@ -59,7 +62,7 @@ PixelRGBTest: build_dir move_tests
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelRGBTest
+		$(BUILD_FLAGS) -Werror -o $(TEST_DIR)/PixelRGBTest
 	./$(TEST_DIR)/PixelRGBTest
 	rm $(TEST_DIR)/PixelRGBTest
 
@@ -68,7 +71,7 @@ PixelHSITest: build_dir move_tests
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
+		$(BUILD_FLAGS) -Werror -o $(TEST_DIR)/PixelHSITest
 	./$(TEST_DIR)/PixelHSITest
 	rm $(TEST_DIR)/PixelHSITest
 
@@ -77,7 +80,7 @@ PixelGreyscaleTest: build_dir move_tests
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
+		$(BUILD_FLAGS) -Werror -o $(TEST_DIR)/PixelHSITest
 	./$(TEST_DIR)/PixelHSITest
 	rm $(TEST_DIR)/PixelHSITest
 
@@ -86,40 +89,48 @@ PixelConversionTest: build_dir move_tests
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelConversionTest
+		$(BUILD_FLAGS) -Werror -o $(TEST_DIR)/PixelConversionTest
 	./$(TEST_DIR)/PixelConversionTest
 	rm $(TEST_DIR)/PixelConversionTest
 
 MaskTest: build_dir move_tests
-	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -std=c++11 -o $(TEST_DIR)/MaskTest
+	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -o $(TEST_DIR)/MaskTest
 	./$(TEST_DIR)/MaskTest
 	rm $(TEST_DIR)/MaskTest
 
 ImageGridTest: build_dir move_tests
-	g++ $(BUILD_DIR)/ImageGridTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) -std=c++11 -o $(TEST_DIR)/ImageGridTest
+	g++ $(BUILD_DIR)/ImageGridTest.cpp $(BUILD_DIR)/mask.cpp                   \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -o $(TEST_DIR)/ImageGridTest
 	./$(TEST_DIR)/ImageGridTest
 	rm $(TEST_DIR)/ImageGridTest
 
 HistogramTest: build_dir move_tests
-	g++ $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) -DTESTING ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/HistogramTest
+	g++ $(BUILD_DIR)/histogram.cpp                                             \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -DTESTING ${CVOPTIONS} -o $(TEST_DIR)/HistogramTest
 	./$(TEST_DIR)/HistogramTest $(ASSETS_DIR)/darkNight.bmp
 	rm $(TEST_DIR)/HistogramTest
 
 Assignment1_Part2: build_dir move_Assignment1
-	g++ $(BUILD_DIR)/assignment1_part2.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment1_Part2
+	g++ $(BUILD_DIR)/assignment1_part2.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment1_Part2
 	./$(TEST_DIR)/Assignment1_Part2 $(ASSETS_DIR)/shapes.bmp $(ASSETS_DIR)/hitchhikers.bmp
 	#./$(TEST_DIR)/Assignment1_Part2 $(ASSETS_DIR)/doge.jpg $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment1_Part2
 
 Assignment1_Part1: build_dir move_Assignment1
-	g++ $(BUILD_DIR)/assignment1_part1.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment1_Part1
+	g++ $(BUILD_DIR)/assignment1_part1.cpp $(BUILD_DIR)/histogram.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment1_Part1
 	./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/darkNight.bmp $(ASSETS_DIR)/darkNight.bmp
 	./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/brightNYC.bmp $(ASSETS_DIR)/brightNYC.bmp
 	#./$(TEST_DIR)/Assignment1_Part1 $(ASSETS_DIR)/doge.jpg $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment1_Part1
 
 Assignment2_Part1: build_dir move_Assignment2
-	g++ $(BUILD_DIR)/assignment2.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) ${CVOPTIONS} -std=c++11 -o $(TEST_DIR)/Assignment2
+	g++ $(BUILD_DIR)/assignment2.cpp $(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment2
 	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/basel_gray.bmp
 	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/ant_gray.bmp
 	#./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/doge.jpg
