@@ -23,3 +23,7 @@ typedef ArithmeticalIntensity<ind_i>     AI_i;
 typedef ArithmeticalIntensity<ind_y>     AI_y;
 typedef ArithmeticalIntensity<ind_u>     AI_u;
 typedef ArithmeticalIntensity<ind_v>     AI_v;
+
+class arithmeticalRGB;
+class arithmeticalHSI;
+class arithmeticalYUV;

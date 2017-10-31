@@ -59,6 +59,11 @@ PixelRGBTest: build_dir move_tests
 	./$(TEST_DIR)/PixelRGBTest
 	rm $(TEST_DIR)/PixelRGBTest
 
+PixelHSITest: build_dir move_tests
+	g++ $(BUILD_DIR)/PixelHSITest.cpp $(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp $(BUILD_FLAGS) -Werror -std=c++11 -o $(TEST_DIR)/PixelHSITest
+	./$(TEST_DIR)/PixelHSITest
+	rm $(TEST_DIR)/PixelHSITest
+
 MaskTest: build_dir move_tests
 	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -std=c++11 -o $(TEST_DIR)/MaskTest
 	./$(TEST_DIR)/MaskTest
