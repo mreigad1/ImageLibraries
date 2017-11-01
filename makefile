@@ -93,6 +93,15 @@ PixelConversionTest: build_dir move_tests
 	./$(TEST_DIR)/PixelConversionTest
 	rm $(TEST_DIR)/PixelConversionTest
 
+DCTTest: build_dir move_tests
+	g++ $(BUILD_DIR)/DCTTest.cpp $(BUILD_DIR)/DCT.cpp                          \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) -o $(TEST_DIR)/MaskTest
+	./$(TEST_DIR)/MaskTest $(ASSETS_DIR)/hitchhikers.bmp
+	rm $(TEST_DIR)/MaskTest
+
 MaskTest: build_dir move_tests
 	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -o $(TEST_DIR)/MaskTest
 	./$(TEST_DIR)/MaskTest

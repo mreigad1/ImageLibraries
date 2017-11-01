@@ -69,7 +69,6 @@ namespace Array2DTest {
 				ASSERT(item2[i][j].word == "bar");
 			}
 		}
-		
 	}
 };
 

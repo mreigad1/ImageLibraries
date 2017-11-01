@@ -4,11 +4,12 @@
 #include <cstring>
 
 template<class T> class Array2D {
-	public:
+	protected:
 		unsigned int h;
 		unsigned int w;
 		T* array;
-		
+
+	public:
 		Array2D() :
 			h(0),
 			w(0),

@@ -5,8 +5,6 @@
 #include "pixel.hpp"
 #include "colorModelEnums.hpp"
 #include "colorModelTypes.hpp"
-#include "arithmeticalRGB.h"
-#include "pixelRGB.h"
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
@@ -51,6 +49,12 @@ template <typename T> class imageGrid {
 			img(h, w, old_data) {
 		}
 
+		imageGrid(unsigned height, unsigned width) :
+			h(height),
+			w(width),
+			img(h, w) {
+		}
+
 		imageGrid() :
 			h(0),
 			w(0),
@@ -58,6 +62,19 @@ template <typename T> class imageGrid {
 		}
 
 		~imageGrid() {
+		}
+
+		//constructor for converting color types
+		template <typename U>
+		imageGrid(const imageGrid<U>& other) :
+			h(other.h),
+			w(other.w),
+			img(other.h, other.w) {
+				for (unsigned int i = 0; i < h; i++) {
+					for (unsigned int j = 0; j < w; j++) {
+						img[i][j] = static_cast<T>(other.img[i][j]);
+					}
+				}
 		}
 
 		imageGrid& operator=(const imageGrid& other) {
@@ -92,6 +109,11 @@ template <typename T> class imageGrid {
 		}
 
 		T& getPixel(const unsigned int x, const unsigned int y) const {
+			static T outOfBounds;
+			outOfBounds = T();	//always reset to empty pixel
+			if (x > Width() || y > Height()) {
+				return outOfBounds;
+			}
 			return img[y][x];
 		}
 
