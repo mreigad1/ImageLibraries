@@ -2,6 +2,8 @@
 #include "constants.hpp"
 #include <math.h>
 
+const unsigned Block::blockSize = 8;
+
 Block::Block() :
 	Array2D<PrecisionType>(BlockSize(), BlockSize()),
 	isDCT(false) {
@@ -153,10 +155,11 @@ DCTImage::DCTImage(unsigned int h, unsigned int w, unsigned int s_h, unsigned in
 	source_w(s_w) {
 }
 
-DCTImage::DCTImage(imageGrid<GreyscalePix::pixelGreyscale>& grid) :
+DCTImage::DCTImage(const imageGrid<GreyscalePix::pixelGreyscale>& grid) :
 	Array2D<Block>(),
 	source_h(grid.Height()),
 	source_w(grid.Width()) {
+		LINE_LOG;
 		unsigned int h_t = grid.Height();
 		unsigned int w_t = grid.Width();
 		while (h_t % BlockSize()) h_t++;
@@ -166,24 +169,27 @@ DCTImage::DCTImage(imageGrid<GreyscalePix::pixelGreyscale>& grid) :
 		const unsigned int h = h_t;
 		const unsigned int w = w_t;
 
+		LINE_LOG;
 		//resize structure
 		(*this) = DCTImage(h, w, h*BlockSize(), w*BlockSize());
 
 		{
 			Block tmp;
-
+			LINE_LOG;
 			//for each 8x8 block in image grid
 			for (unsigned int i = 0; i < h; i++) {
 				for (unsigned int j = 0; j < w; j++) {
 
 					//create Array2D for block
 					((*this)[i][j]) = tmp;
-
+					LINE_LOG;
 					//Copy intensities to 8x8 grid
 					for (unsigned int y = 0; y < BlockSize(); y++) {
 						for (unsigned int x = 0; x < BlockSize(); x++) {
-							//Block& b = (*this[i][j]);//array[i * Width() + j]);
-							//b[y][x] = grid.getPixel(i * BlockSize() + x, j * BlockSize() + y).I();
+							Block& b = ((*this)[i][j]);
+							LINE_LOG;
+							b[y][x] = grid.getPixel(i * BlockSize() + x, j * BlockSize() + y).I();
+							LINE_LOG;
 						}
 					}
 				}
@@ -219,7 +225,7 @@ imageGrid<GreyscalePix::pixelGreyscale> DCTImage::ComputeDct() const {
 			for (unsigned int j = 0; j < result.Width(); j++) {
 				for (unsigned int x = 0; x < BlockSize(); x++) {
 					for (unsigned int y = 0; y < BlockSize(); y++) {
-						//retVal.getPixel(i * BlockSize() + x, j * BlockSize() + y) = result[i][j][x][y];
+						retVal.getPixel(i * BlockSize() + x, j * BlockSize() + y) = GreyscalePix::pixelGreyscale((result[i][j])[x][y]);
 					}
 				}
 			}
@@ -236,7 +242,7 @@ imageGrid<GreyscalePix::pixelGreyscale> DCTImage::ComputeInverseDct() const {
 			for (unsigned int j = 0; j < result.Width(); j++) {
 				for (unsigned int x = 0; x < BlockSize(); x++) {
 					for (unsigned int y = 0; y < BlockSize(); y++) {
-						//retVal.getPixel(i * BlockSize() + x, j * BlockSize() + y) = result[i][j][x][y];
+						retVal.getPixel(i * BlockSize() + x, j * BlockSize() + y) = GreyscalePix::pixelGreyscale((result[i][j])[x][y]);
 					}
 				}
 			}

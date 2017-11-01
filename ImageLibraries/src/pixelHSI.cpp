@@ -195,10 +195,7 @@ namespace HSIPix {
 
 	//get binary thresholded pixel
 	pixelHSI pixelHSI::toNegative() const {
-		RGBPix::arithmeticalRGB tmp = static_cast<RGBPix::arithmeticalRGB>(*this);
-		RGBPix::arithmeticalRGB rvTmp(MAX_BYTE - tmp.R(), MAX_BYTE - tmp.G(), MAX_BYTE - tmp.B());
-		pixelHSI rv = static_cast<arithmeticalHSI>(rv);
-		return rv;
+		return pixelHSI((tPI - hsi.m_h.value()), (1.0 - hsi.m_s.value()), (1.0 - hsi.m_i.value()));
 	}
 
 	//greyscale histogram shift
@@ -284,7 +281,7 @@ namespace HSIPix {
 					r = z;
 				break;
 				default:
-					ASSERT("Error converting HSI to RGB" == false);
+					ASSERT("Error converting HSI to RGB" == nullptr);
 				break;
 			}
 		}

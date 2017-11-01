@@ -18,32 +18,33 @@ namespace assignment2 {
 
 		//setup all displayable images
 		Mat originalImage = imread(test_file, CV_LOAD_IMAGE_GRAYSCALE);
-		Mat DCTImage = imread(test_file, CV_LOAD_IMAGE_GRAYSCALE);
-		Mat IDCTImage = imread(test_file, CV_LOAD_IMAGE_GRAYSCALE);
-
+		Mat dctProcessedImage = imread(test_file, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat idctProcessedImage = imread(test_file, CV_LOAD_IMAGE_GRAYSCALE);
+		LINE_LOG;
 		//ensure all images are valid
 		ASSERT(nullptr != originalImage.data);
-
+		LINE_LOG;
 		//Windowing text
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
 
 		//construct imageGrids
 		imageGrid<GreyscalePix::pixelGreyscale> originalGrid(originalImage.rows, originalImage.step / 1, (GreyscalePix::pixelGreyscale*)&originalImage.data[0]);
-
+		LINE_LOG;
 		//construct DCT's
-		DCTImage device(originalGrid);
-		imageGrid<GreyscalePix::pixelGreyscale> DCT_G = device.ComputeDCT();
-		imageGrid<GreyscalePix::pixelGreyscale> IDCT_G = device.ComputeDCT();
-
+		DCTImage dctProcessor(originalGrid);
+		LINE_LOG;
+		imageGrid<GreyscalePix::pixelGreyscale> DCT_G = dctProcessor.ComputeDct();
+		imageGrid<GreyscalePix::pixelGreyscale> IDCT_G = dctProcessor.ComputeDct();
+		LINE_LOG;
 		//commit image changes
 		originalGrid.commitImageGrid((GreyscalePix::pixelGreyscale*)&originalImage.data[0]);
-		DCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&DCTImage.data[0]);
-		IDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&IDCTImage.data[0]);
-
+		DCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&dctProcessedImage.data[0]);
+		IDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&idctProcessedImage.data[0]);
+		LINE_LOG;
 		//display results
 		imshow("Original Image", originalImage);
-		imshow("DCT Image", DCTImage);
-		imshow("IDCT Image", IDCTImage);
+		imshow("DCT Image", dctProcessedImage);
+		imshow("IDCT Image", idctProcessedImage);
 
 		//Display loop
 		bool loop = true;

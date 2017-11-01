@@ -3,9 +3,9 @@
 #include "pixelGreyscale.h"
 #include "imageGrid.hpp"
 
-class Block : Array2D<PrecisionType> {
+class Block : public Array2D<PrecisionType> {
 	private:
-		static const unsigned blockSize = 8;
+		static const unsigned blockSize;
 		const PrecisionType& cos8(unsigned int i, unsigned int j) const;
 		const PrecisionType& alpha8(unsigned int i) const;
 		bool isDCT;
@@ -18,7 +18,7 @@ class Block : Array2D<PrecisionType> {
 		Block ComputeInverseDct() const;
 };
 
-class DCTImage : Array2D<Block> {
+class DCTImage : public Array2D<Block> {
 	private:
 		unsigned int source_h;
 		unsigned int source_w;
@@ -26,7 +26,7 @@ class DCTImage : Array2D<Block> {
 		static const unsigned& BlockSize();
 		DCTImage(const DCTImage& other);
 		DCTImage(unsigned int h, unsigned int w, unsigned int s_h, unsigned int s_w);
-		DCTImage(imageGrid<GreyscalePix::pixelGreyscale>& grid);
+		DCTImage(const imageGrid<GreyscalePix::pixelGreyscale>& grid);
 		DCTImage& operator=(const DCTImage& other);
 
 		DCTImage toDct() const;
