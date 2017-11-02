@@ -12,6 +12,12 @@ namespace HSIPix {
 		pixel<pixelHSI>() {
 	}
 
+	pixelHSI::pixelHSI(byte intensity) {
+		hsi.m_h = 0;
+		hsi.m_s = 0;
+		hsi.m_i = intensity;
+	}
+
 	//explicit constructor
 	pixelHSI::pixelHSI(PrecisionType h, PrecisionType s, PrecisionType i) :
 		pixel<pixelHSI>() {
@@ -225,6 +231,22 @@ namespace HSIPix {
 
 	PrecisionType pixelHSI::I() const {
 		return hsi.m_i.value();
+	}
+
+	PrecisionType pixelHSI::dataComponent1() const {
+		return static_cast<PrecisionType>((H() / tPI));
+	}
+
+	PrecisionType pixelHSI::dataComponent2() const {
+		return static_cast<PrecisionType>(S());
+	}
+	
+	PrecisionType pixelHSI::dataComponent3() const {
+		return static_cast<PrecisionType>(I());
+	}
+
+	pixelHSI pixelHSI::denormalized(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
+		return pixelHSI(c1 * tPI, c2, c3);
 	}
 
 	arithmeticalHSI pixelHSI::Arithmetical() const {

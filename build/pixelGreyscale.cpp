@@ -18,6 +18,12 @@ namespace GreyscalePix {
 		m_i(intensity) {
 	}
 
+	//explicit constructor
+	pixelGreyscale::pixelGreyscale(byte r, byte g, byte b) :
+		pixel<pixelGreyscale>(),
+		m_i(static_cast<byte>((r / 3.0) + (g / 3.0) + (b / 3.0))) {
+	}
+
 	//const constructor
 	pixelGreyscale::pixelGreyscale(const pixelGreyscale& other) :
 		pixel<pixelGreyscale>(),
@@ -194,6 +200,22 @@ namespace GreyscalePix {
 
 	byte pixelGreyscale::I() const {
 		return m_i.value();
+	}
+
+	PrecisionType pixelGreyscale::dataComponent1() const {
+		return static_cast<PrecisionType>(I() / 255.0);
+	}
+
+	PrecisionType pixelGreyscale::dataComponent2() const {
+		return static_cast<PrecisionType>(I() / 255.0);
+	}
+
+	PrecisionType pixelGreyscale::dataComponent3() const {
+		return static_cast<PrecisionType>(I() / 255.0);
+	}
+
+	pixelGreyscale pixelGreyscale::denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
+		return pixelGreyscale(c1 * 255, c2 * 255, c3 * 255);
 	}
 
 	arithmeticalGreyscale pixelGreyscale::Arithmetical() const {

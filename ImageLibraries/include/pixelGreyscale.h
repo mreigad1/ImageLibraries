@@ -17,6 +17,7 @@ namespace GreyscalePix {
 		public:
 			pixelGreyscale();																//empty constructor
 			pixelGreyscale(byte intensity);													//explicit constructor
+			pixelGreyscale(byte r, byte g, byte b);											//explicit constructor for average intensity
 			pixelGreyscale(const pixelGreyscale& other);									//const constructor
 			pixelGreyscale(const arithmeticalGreyscale& other);								//downcast constructor
 			std::string toString() const;													//toString
@@ -49,7 +50,12 @@ namespace GreyscalePix {
 			pixelGreyscale toNegative() const;												//greyscale pixel transformation
 			byte getAvgIntensity() const;													//get average brightness
 			pixelGreyscale toBinary(pixelGreyscale thresh) const;							//get binary thresholded pixel
-			byte I() const;																//get intensity
+			byte I() const;																	//get intensity
+
+			PrecisionType dataComponent1() const;											//static polymorphic alias for I [0.0, 1.0]
+			PrecisionType dataComponent2() const;											//static polymorphic alias for I [0.0, 1.0]
+			PrecisionType dataComponent3() const;											//static polymorphic alias for I [0.0, 1.0]
+			static pixelGreyscale denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3);
 
 			//cast operators
 			arithmeticalGreyscale Arithmetical() const;

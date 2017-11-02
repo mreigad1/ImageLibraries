@@ -98,7 +98,6 @@ DCTTest: build_dir move_tests
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_DIR)/histogram.cpp                                             \
 		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/MaskTest
 	./$(TEST_DIR)/MaskTest $(ASSETS_DIR)/Disk.bmp > test.txt
 	rm $(TEST_DIR)/MaskTest
@@ -118,7 +117,7 @@ ImageGridTest: build_dir move_tests
 	rm $(TEST_DIR)/ImageGridTest
 
 HistogramTest: build_dir move_tests
-	g++ $(BUILD_DIR)/histogram.cpp                                             \
+	g++ $(BUILD_DIR)/histogramTest.cpp                                         \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
@@ -127,7 +126,7 @@ HistogramTest: build_dir move_tests
 	rm $(TEST_DIR)/HistogramTest
 
 Assignment1_Part2: build_dir move_Assignment1
-	g++ $(BUILD_DIR)/assignment1_part2.cpp $(BUILD_DIR)/histogram.cpp          \
+	g++ $(BUILD_DIR)/assignment1_part2.cpp                                     \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
@@ -137,7 +136,7 @@ Assignment1_Part2: build_dir move_Assignment1
 	rm $(TEST_DIR)/Assignment1_Part2
 
 Assignment1_Part1: build_dir move_Assignment1
-	g++ $(BUILD_DIR)/assignment1_part1.cpp $(BUILD_DIR)/histogram.cpp          \
+	g++ $(BUILD_DIR)/assignment1_part1.cpp                                     \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \

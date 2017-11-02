@@ -13,6 +13,14 @@ namespace RGBPix {
 	}
 
 	//explicit constructor
+	pixelRGB::pixelRGB(byte intensity) :
+		pixel<pixelRGB>() {
+			rgb.m_r = intensity;
+			rgb.m_g = intensity;
+			rgb.m_b = intensity;
+	}
+
+	//explicit constructor
 	pixelRGB::pixelRGB(byte r, byte g, byte b) :
 		pixel<pixelRGB>() {
 			rgb.m_r = r;
@@ -208,34 +216,6 @@ namespace RGBPix {
 		return retVal;
 	}
 
-	//greyscale histogram shift
-	pixelRGB pixelRGB::histogramShift(unsigned int average) const {
-		byte retGreyVal = getAvgIntensity();
-		float midPoint = MAX_BYTE / 2;
-		const unsigned int trivialCases[] = { 0, (unsigned int)midPoint, MAX_BYTE };
-
-		//loop handles error cases of 0, 255, and trivial case of already greyscale balanced
-		for (unsigned int i = 0; i < sizeof(trivialCases)/sizeof(unsigned int); i++) {
-			if (trivialCases[i] == average) {
-				return pixelRGB(retGreyVal, retGreyVal, retGreyVal);
-			}
-		}
-
-		float newValue = retGreyVal;
-		if (1 > newValue) {
-			newValue = 1;
-		}
-
-		//linear transform of number line for intensities
-		if (newValue < average) {
-			newValue = newValue * midPoint / average;
-		} else if (newValue > average) {
-			newValue = ((newValue - average) * (midPoint / (MAX_BYTE - average))) + midPoint;
-		}
-		retGreyVal = (byte)newValue;
-		return pixelRGB(retGreyVal, retGreyVal, retGreyVal);
-	}
-
 	pixelRGB pixelRGB::coordHash(unsigned int x, unsigned int y) const {
 		x = x & 0x0FFF;
 		y = y & 0x0FFF;
@@ -281,8 +261,24 @@ namespace RGBPix {
 		return rgb.m_b.value();
 	}
 
+	PrecisionType pixelRGB::dataComponent1() const {
+		return static_cast<PrecisionType>(R() / 255.0);
+	}
+
+	PrecisionType pixelRGB::dataComponent2() const {
+		return static_cast<PrecisionType>(G() / 255.0);
+	}
+	
+	PrecisionType pixelRGB::dataComponent3() const {
+		return static_cast<PrecisionType>(B() / 255.0);
+	}
+
 	arithmeticalRGB pixelRGB::Arithmetical() const {
 		return static_cast<RGBPix::arithmeticalRGB>(*this);
+	}
+
+	pixelRGB pixelRGB::denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
+		return pixelRGB(c1 * 255, c2 * 255, c3 * 255);
 	}
 
 	pixelRGB::operator RGBPix::arithmeticalRGB() const {

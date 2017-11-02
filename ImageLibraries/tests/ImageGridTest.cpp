@@ -14,8 +14,8 @@ namespace ImageGridTest {
 				data[i * width + j] = RGBPix::pixelRGB(i * i & MAX_BYTE, j * i & MAX_BYTE, j * j & MAX_BYTE);
 			}
 		}
-		imageGrid<RGBPix::pixelRGB> smallStart(height, width, data)
-;		delete[] data;
+		imageGrid<RGBPix::pixelRGB> smallStart(height, width, data);
+		delete[] data;
 		data = NULL;
 		return smallStart;
 	}

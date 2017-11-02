@@ -125,6 +125,21 @@ template<typename Implementation> class pixel {
 			return static_cast<Implementation>(*this).getAvgIntensity();
 		}
 
+		//get average brightness
+		PrecisionType dataComponent1() const {
+			return static_cast<Implementation>(*this).dataComponent1();
+		}
+
+		//get average brightness
+		PrecisionType dataComponent2() const {
+			return static_cast<Implementation>(*this).dataComponent2();
+		}
+
+		//get average brightness
+		PrecisionType dataComponent3() const {
+			return static_cast<Implementation>(*this).dataComponent3();
+		}
+
 		//get binary thresholded pixel
 		Implementation toBinary(Implementation& thresh) const {
 			return static_cast<Implementation>(*this).toBinary(thresh);

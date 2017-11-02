@@ -25,7 +25,8 @@ namespace RGBPix {
 		private:
 			RGB rgb;
 		public:
-			pixelRGB();															//empty constructor
+			pixelRGB();	
+			pixelRGB(byte intensity);											//empty constructor
 			pixelRGB(byte r, byte g, byte b);									//explicit constructor
 			pixelRGB(const pixelRGB& other);									//const constructor
 			pixelRGB(const arithmeticalRGB& other);								//downcast constructor
@@ -55,13 +56,16 @@ namespace RGBPix {
 			bool operator>(const pixelRGB& m) const;							//strict greater than for pixel primitives
 			pixelRGB toGrey() const;											//get pixel as greyscale
 			pixelRGB coordHash(unsigned int x, unsigned int y) const;			//pixel color based on position
-			pixelRGB histogramShift(unsigned int average) const;				//greyscale histogram shift
 			pixelRGB toNegative() const;										//greyscale pixel transformation
 			byte getAvgIntensity() const;										//get average brightness
 			pixelRGB toBinary(pixelRGB thresh) const;							//get binary thresholded pixel
 			byte R() const;
 			byte G() const;
 			byte B() const;
+			PrecisionType dataComponent1() const;								//static polymorphic alias for normalized [0,1] R component
+			PrecisionType dataComponent2() const;								//static polymorphic alias for normalized [0,1] G component
+			PrecisionType dataComponent3() const;								//static polymorphic alias for normalized [0,1] B component
+			static pixelRGB denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3);
 
 			//cast operators
 			arithmeticalRGB Arithmetical() const;

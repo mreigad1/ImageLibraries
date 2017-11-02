@@ -25,7 +25,8 @@ namespace HSIPix {
 			HSI hsi;
 		public:
 			pixelHSI();															//empty constructor
-			pixelHSI(PrecisionType h, PrecisionType s, PrecisionType i);									//explicit constructor
+			pixelHSI(byte intensity);											//empty constructor
+			pixelHSI(PrecisionType h, PrecisionType s, PrecisionType i);		//explicit constructor
 			pixelHSI(const pixelHSI& other);									//const constructor
 			pixelHSI(const arithmeticalHSI& other);								//downcast constructor
 			std::string toString() const;										//toString
@@ -61,6 +62,10 @@ namespace HSIPix {
 			PrecisionType H() const;
 			PrecisionType S() const;
 			PrecisionType I() const;
+			PrecisionType dataComponent1() const;								//static polymorphic alias for H [0, 1] component
+			PrecisionType dataComponent2() const;								//static polymorphic alias for S [0, 1] component
+			PrecisionType dataComponent3() const;								//static polymorphic alias for I [0, 1] component
+			static pixelHSI denormalized(PrecisionType c1, PrecisionType c2, PrecisionType c3);	//explicit constructor
 
 			//cast operators
 			arithmeticalHSI Arithmetical() const;
