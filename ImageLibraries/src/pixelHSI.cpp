@@ -227,6 +227,10 @@ namespace HSIPix {
 		return hsi.m_i.value();
 	}
 
+	arithmeticalHSI pixelHSI::Arithmetical() const {
+		return static_cast<arithmeticalHSI>(*this);
+	}
+
 	pixelHSI::operator HSIPix::arithmeticalHSI() const {
 		return HSIPix::arithmeticalHSI(H(), S(), I());
 	}

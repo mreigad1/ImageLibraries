@@ -281,6 +281,10 @@ namespace RGBPix {
 		return rgb.m_b.value();
 	}
 
+	arithmeticalRGB pixelRGB::Arithmetical() const {
+		return static_cast<RGBPix::arithmeticalRGB>(*this);
+	}
+
 	pixelRGB::operator RGBPix::arithmeticalRGB() const {
 		return RGBPix::arithmeticalRGB(R(), G(), B());
 	}

@@ -1,0 +1,8 @@
+"\tQuestion:\n\tCompare the results of (a) and (b). For this particular case would you ",
+"\n\tsuggest a block size of 8 or 16 for greater compression? Justify your \n\tanswer.\n\n",
+"\tAnswer:\n\t\tThe first 8 elements are nearly identical, this means that they may be very \n",
+"\t\teffectively compressed together with very little frequency datum. The first 8\n",
+"\t\telements vary significantly from the second 8 elements which are more alike to\n",
+"\t\teach other than the first sequence. This means that compressing each of the two\n",
+"\t\tlines separately will yield better compression volume and accuracy than\n",
+"\t\tcompressing the entire 16 numbers together.\n"

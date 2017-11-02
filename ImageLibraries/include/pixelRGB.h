@@ -64,6 +64,7 @@ namespace RGBPix {
 			byte B() const;
 
 			//cast operators
+			arithmeticalRGB Arithmetical() const;
 			operator arithmeticalRGB() const;									//allow implicit conversion to arithmeticalRGB
 			explicit operator HSIPix::arithmeticalHSI() const;					//only allow explicit conversion to other pixel types
 			explicit operator GreyscalePix::arithmeticalGreyscale() const;

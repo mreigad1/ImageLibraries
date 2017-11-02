@@ -22,7 +22,7 @@ template<class T> class Array2D {
 			array(new T[_h * _w]) {
 		}
 
-		Array2D(unsigned int _h, unsigned int _w, T* other) :
+		Array2D(unsigned int _h, unsigned int _w, const T* other) :
 			h(_h),
 			w(_w),
 			array(new T[_h * _w]) {

@@ -196,6 +196,10 @@ namespace GreyscalePix {
 		return m_i.value();
 	}
 
+	arithmeticalGreyscale pixelGreyscale::Arithmetical() const {
+		return static_cast<arithmeticalGreyscale>(*this);
+	}
+
 	pixelGreyscale::operator GreyscalePix::arithmeticalGreyscale() const {
 		return GreyscalePix::arithmeticalGreyscale(I());
 	}

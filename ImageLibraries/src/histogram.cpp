@@ -13,7 +13,7 @@ histogram::histogram(imageGrid<RGB_P>& input) : image(input){
 		unsigned long long acc = 0;
 		for (unsigned int i = 0; i < image.Height(); i++) {
 			for (unsigned int j = 0; j < image.Width(); j++) {
-				unsigned int intensity = image.getPixel(j,i).getAvgIntensity();
+				unsigned int intensity = image.getPixel(i, j).getAvgIntensity();
 				pdf[intensity]++;
 				acc += intensity;
 			}
@@ -36,7 +36,7 @@ void histogram::apply() {
 	imageGrid<RGB_P> tmp_image = image;
 	for (unsigned int i = 0; i < image.Height(); i++) {
 		for (unsigned int j = 0; j < image.Width(); j++) {
-			tmp_image.getPixel(j, i) = image.getPixel(j, i).histogramShift(average);
+			tmp_image.getPixel(i, j) = image.getPixel(i, j).histogramShift(average);
 		}
 	}
 	image = tmp_image;

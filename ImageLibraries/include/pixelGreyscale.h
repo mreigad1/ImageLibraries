@@ -52,6 +52,7 @@ namespace GreyscalePix {
 			byte I() const;																//get intensity
 
 			//cast operators
+			arithmeticalGreyscale Arithmetical() const;
 			operator arithmeticalGreyscale() const;											//allow implicit conversion to arithmeticalGreyscale
 			explicit operator RGBPix::arithmeticalRGB() const;								//only allow explicit conversion to other pixel types
 			explicit operator HSIPix::arithmeticalHSI() const;

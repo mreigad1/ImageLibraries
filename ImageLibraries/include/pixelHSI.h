@@ -63,6 +63,7 @@ namespace HSIPix {
 			PrecisionType I() const;
 
 			//cast operators
+			arithmeticalHSI Arithmetical() const;
 			operator arithmeticalHSI() const;									//allow implicit conversion to arithmeticalHSI
 			explicit operator RGBPix::arithmeticalRGB() const;					//only allow explicit conversion to other pixel types
 			explicit operator GreyscalePix::arithmeticalGreyscale() const;

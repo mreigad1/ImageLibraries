@@ -37,7 +37,7 @@
 //back to imageGrid buffer following operations
 //implements pixels buffer with pixel implementation T
 template <typename T> class imageGrid {
-	private:
+	protected:
 		unsigned int h;
 		unsigned int w;
 		Array2D<T> img;
@@ -67,12 +67,13 @@ template <typename T> class imageGrid {
 		//constructor for converting color types
 		template <typename U>
 		imageGrid(const imageGrid<U>& other) :
-			h(other.h),
-			w(other.w),
-			img(other.h, other.w) {
+			h(other.Height()),
+			w(other.Width()),
+			img(other.Height(), other.Width()) {
 				for (unsigned int i = 0; i < h; i++) {
 					for (unsigned int j = 0; j < w; j++) {
-						img[i][j] = static_cast<T>(other.img[i][j]);
+						auto q = img[i][j].Arithmetical();				//arithHSI
+						img[i][j] = static_cast<decltype(q)>(other.getPixel(i, j));
 					}
 				}
 		}
@@ -108,10 +109,10 @@ template <typename T> class imageGrid {
 			return w;
 		}
 
-		T& getPixel(const unsigned int x, const unsigned int y) const {
+		T& getPixel(const unsigned int y, const unsigned int x) const {
 			static T outOfBounds;
 			outOfBounds = T();	//always reset to empty pixel
-			if (x > Width() || y > Height()) {
+			if (x >= img.Width() || y >= img.Height()) {
 				return outOfBounds;
 			}
 			return img[y][x];

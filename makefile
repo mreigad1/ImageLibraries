@@ -99,7 +99,7 @@ DCTTest: build_dir move_tests
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
 		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/MaskTest
-	./$(TEST_DIR)/MaskTest $(ASSETS_DIR)/hitchhikers.bmp
+	./$(TEST_DIR)/MaskTest $(ASSETS_DIR)/basel3.bmp > test.txt
 	rm $(TEST_DIR)/MaskTest
 
 MaskTest: build_dir move_tests

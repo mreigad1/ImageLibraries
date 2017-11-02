@@ -25,3 +25,11 @@ enum ColorIndex {
 	ind_u    = 9,
 	ind_v    = 10
 };
+
+//enumerates image quality
+enum ImageQuality {
+	LOW  = 1,
+	MED  = 2,
+	HIGH = 3,
+	FULL = 4
+};
