@@ -30,17 +30,15 @@ int clusteringDriver1(int argc, char **argv) {
 	//namedWindow(windowText.c_str());
 
 	imageGrid<RGB_P> test_grid(buffer_img.rows, buffer_img.step / 3, (RGB_P*)&buffer_img.data[0]);
-	test_grid.toGrey();
-	//test_grid.darkMedianFilter();
-	//imageGrid<RGB_P> filter_grid = test_grid;
+	test_grid = test_grid.toGrey();
 
 	std::cout << "\nHistogram of Image"; 
 	histogram disp_histogram(test_grid);
-	disp_histogram.display();
+	std::cout << disp_histogram.toString();
 	const byte thresh = 35;
 	std::cout << "\n(PART 1) Optimal threshold of ~" << (int)thresh << " hardcoded, though determined from Histogram\n";
 	
-	test_grid.toBinary(RGB_P(thresh, thresh, thresh));
+	test_grid = test_grid.toBinary(RGB_P(thresh, thresh, thresh));
 	test_grid.commitImageGrid((RGB_P*)&image_part2.data[0]);
 
 	auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));
@@ -86,17 +84,17 @@ int clusteringDriver2(int argc, char **argv) {
 	//namedWindow(windowText.c_str());
 
 	imageGrid<RGB_P> test_grid(buffer_img.rows, buffer_img.step / 3, (RGB_P*)&buffer_img.data[0]);
-	test_grid.toGrey();
+	test_grid = test_grid.toGrey();
 	//test_grid.darkMedianFilter();
 	//imageGrid<RGB_P> filter_grid = test_grid;
 
 	std::cout << "\nHistogram of Image"; 
 	histogram disp_histogram(test_grid);
-	disp_histogram.display();
+	std::cout << disp_histogram.toString();
 	const byte thresh = 50;
 	std::cout << "\n(PART 1) Optimal threshold of ~" << (int)thresh << " hardcoded, though determined from Histogram\n";
 	
-	test_grid.toBinary(RGB_P(thresh, thresh, thresh));
+	test_grid = test_grid.toBinary(RGB_P(thresh, thresh, thresh));
 	test_grid.commitImageGrid((RGB_P*)&image_part2.data[0]);
 
 	auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));

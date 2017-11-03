@@ -13,9 +13,6 @@
 using namespace std;
 using namespace cv;
 
-typedef RGBPix::pixelRGB RGB_P;
-typedef histogramProcessor<RGB_P> histogram;
-
 namespace assignment3 {
 
 	int BlockTest() {
@@ -200,24 +197,6 @@ namespace assignment3 {
 		return 0;
 	}
 
-	const mask& UnsharpMask() {
-		// static PrecisionType arr[] = {
-		// 	-1, -2, -1,
-		// 	-2, 13, -2,
-		// 	-1, -2, -1
-		// };
-		// static mask um(3, arr);
-		static PrecisionType arr[] = {
-			  -1,   -4,   -6,   -4,   -1,
-			  -4,  -16,  -24,  -16,   -4,
-			  -6,  -24,  476,  -24,   -6,
-			  -4,  -16,  -24,  -16,   -4,
-			  -1,   -4,   -6,   -4,   -1,
-		};
-		static mask um(5, arr, 1.0 / 256);
-		return um;
-	}
-
 	int ROI_Driver(int argc, char **argv) {
 		ASSERT(2 == argc);
 		const char* test_file = argv[1];
@@ -230,34 +209,35 @@ namespace assignment3 {
 
 		//Create the display window
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
+		//namedWindow(windowText.c_str());
+
 		imageGrid<RGB_P> test_grid(buffer_img.rows, buffer_img.step / 3, (RGB_P*)&buffer_img.data[0]);
-		imageGrid<RGB_P> unmodified_grid(test_grid);
+		imageGrid<RGB_P> stashed_grid(test_grid);
+		test_grid.toGrey();
+		//test_grid.darkMedianFilter();
+		//imageGrid<RGB_P> filter_grid = test_grid;
 
-		{
-			test_grid = histogram(test_grid, 20, 90).histogramCorrection();
-			test_grid = test_grid - test_grid.sobel() - test_grid.sobel();
-			test_grid = histogram(test_grid, 20, 90).histogramCorrection();
-			test_grid.commitImageGrid((RGB_P*)&image_part2.data[0]);
-			test_grid = unmodified_grid;
+		std::cout << "\nHistogram of Image"; 
+		histogram disp_histogram(test_grid);
+		disp_histogram.display();
+		const byte thresh = disp_histogram.getMinima();
+		
+		test_grid.toBinary(RGB_P(thresh, thresh, thresh));
+		test_grid.commitImageGrid((RGB_P*)&image_part2.data[0]);
 
-			test_grid = test_grid - test_grid.sobel();
-			test_grid.commitImageGrid((RGB_P*)&clustered_image.data[0]);
-			test_grid = unmodified_grid;
+		auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));
+		test_grid.commitImageGrid((RGB_P*)&clustered_image.data[0]);
 
-			test_grid = test_grid.multiplyByMask(UnsharpMask());
-			test_grid = test_grid - test_grid.sobel();
-			test_grid = test_grid.multiplyByMask(UnsharpMask());
-			test_grid.commitImageGrid((RGB_P*)&image_part3.data[0]);
-			test_grid = unmodified_grid;
-		}
+		test_grid.assignment3Coloring(clusters, stashed_grid);
+		test_grid.commitImageGrid((RGB_P*)&image_part3.data[0]);
 
 		//Display loop
 		bool loop = true;
 		while(loop) {
 			imshow("Original image", original_image);
 			imshow("PART 2 Image", image_part2);
-			//imshow("Part 3 Image", clustered_image);
-			//imshow("PART 4 Image", image_part3);
+			imshow("Clustered Groups Image", clustered_image);
+			imshow("PART 3 Image", image_part3);
 
 			switch(cvWaitKey(15)) {
 				case 27:  //Esc key case
@@ -277,8 +257,8 @@ namespace assignment3 {
 int main (int argc, char **argv) {
 	bool test = 0;
 	//test |= assignment3::BlockTest();
-	//test |= assignment3::partB1(argc, argv);
-	//test |= assignment3::partB2(argc, argv);
-	test |= assignment3::ROI_Driver(argc, argv);
+	test |= assignment3::partB1(argc, argv);
+	test |= assignment3::partB2(argc, argv);
+	//test |= assignment3::ROI_Driver(argc, argv);
 	return test;
 }

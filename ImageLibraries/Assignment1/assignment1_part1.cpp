@@ -28,7 +28,7 @@ int colorInversion(int argc, char **argv) {
 	//namedWindow(windowText.c_str());
 
 	imageGrid<RGB_P> test_grid(test_image.rows, test_image.step / 3, (RGB_P*)&test_image.data[0]);
-	test_grid.toGrey();
+	test_grid = test_grid.toGrey();
 	//test_grid.darkMedianFilter();
 	//imageGrid<RGB_P> filter_grid = test_grid;
 
@@ -36,7 +36,7 @@ int colorInversion(int argc, char **argv) {
 	//histogram disp_histogram(test_grid);
 	//disp_histogram.display();
 
-	test_grid.toNegative();
+	test_grid = test_grid.toNegative();
 
 	std::cout << "\nHistogram after taking negative";
 	//histogram disp2_histogram(test_grid);
@@ -68,13 +68,13 @@ int histogramCorrection (int argc, char **argv) {
 
 	std::cout << "\nHistogram of Original"; 
 	histogram disp_histogram(test_grid);
-	disp_histogram.display();
+	std::cout << disp_histogram.toString();
 
 	test_grid = disp_histogram.histogramCorrection();
 
 	std::cout << "\nHistogram after balancing";
 	histogram disp2_histogram(test_grid);
-	disp2_histogram.display();
+	std::cout << disp2_histogram.toString();
 
 	test_grid.commitImageGrid((RGB_P*)&test_image.data[0]);
 

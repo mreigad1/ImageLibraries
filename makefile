@@ -30,6 +30,8 @@ Assignment1:	Assignment1_Part1	\
 
 Assignment2:	Assignment2_Part1	\
 
+Assignment3:	Assignment3_Part1	\
+
 perform_test: 	debugTest			\
 				Array2DTest			\
 				ByteIntensityTest	\
@@ -94,13 +96,15 @@ PixelConversionTest: build_dir move_tests
 	rm $(TEST_DIR)/PixelConversionTest
 
 DCTTest: build_dir move_tests
-	g++ $(BUILD_DIR)/DCTTest.cpp $(BUILD_DIR)/DCT.cpp                          \
+	g++ $(BUILD_DIR)/DCTTest.cpp                                               \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/DCT.cpp                             \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/MaskTest
-	./$(TEST_DIR)/MaskTest $(ASSETS_DIR)/Disk.bmp > test.txt
-	rm $(TEST_DIR)/MaskTest
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/DCTTest
+	./$(TEST_DIR)/DCTTest $(ASSETS_DIR)/Building1.bmp > test.txt
+	./$(TEST_DIR)/DCTTest $(ASSETS_DIR)/Disk.bmp > test.txt
+	rm $(TEST_DIR)/DCTTest
 
 MaskTest: build_dir move_tests
 	g++ $(BUILD_DIR)/MaskTest.cpp $(BUILD_DIR)/mask.cpp $(BUILD_FLAGS) -o $(TEST_DIR)/MaskTest
@@ -157,6 +161,16 @@ Assignment2_Part1: build_dir move_Assignment2
 	#./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/doge.jpg
 	rm $(TEST_DIR)/Assignment2
 
+Assignment3_Part1: build_dir move_Assignment3
+	g++ $(BUILD_DIR)/assignment3.cpp $(BUILD_DIR)/DCT.cpp                      \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment3
+	./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/Building1.bmp > test.txt
+	#./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/Disk.bmp > test.txt
+	rm $(TEST_DIR)/Assignment3
+
 move_tests:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(TEST_DIR)
@@ -169,6 +183,10 @@ move_Assignment1:
 move_Assignment2:
 	mkdir -p $(BUILD_DIR)
 	cp ImageLibraries/Assignment2/* $(BUILD_DIR)
+
+move_Assignment3:
+	mkdir -p $(BUILD_DIR)
+	cp ImageLibraries/Assignment3/* $(BUILD_DIR)
 
 build_dir:
 	mkdir -p $(BUILD_DIR)

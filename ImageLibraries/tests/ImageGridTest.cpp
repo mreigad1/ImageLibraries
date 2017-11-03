@@ -29,9 +29,8 @@ namespace ImageGridTest {
 		auto my_grid = getGrid();
 		auto my_mask = getMask();
 
-		my_grid.toNegative();
-
-		//my_grid.multiply(my_mask);
+		my_grid = my_grid.toNegative();
+		my_grid = my_grid.multiplyByMask(my_mask);
 
 		return 0;
 	}

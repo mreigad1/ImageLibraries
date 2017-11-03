@@ -53,32 +53,18 @@ namespace assignment2 {
 		//Windowing text
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
 
+		//constuct mask
+		mask m7 = mask::makeLOG(7, 1.4);
+		mask m11 = mask::makeLOG(11, 5.0);
+		std::cout << m7.toString() << std::endl;
+		std::cout << m11.toString() << std::endl;
+
 		//construct imageGrids
 		imageGrid<RGB_P> originalGrid(originalImage.rows, originalImage.step / 3, (RGB_P*)&originalImage.data[0]);
-		imageGrid<RGB_P> UnsharpGrid(UnsharpImage.rows, UnsharpImage.step / 3, (RGB_P*)&UnsharpImage.data[0]);
-		imageGrid<RGB_P> SobelGrid(SobelImage.rows, SobelImage.step / 3, (RGB_P*)&SobelImage.data[0]);
-		imageGrid<RGB_P> Log7Grid(Log7Image.rows, Log7Image.step / 3, (RGB_P*)&Log7Image.data[0]);
-		imageGrid<RGB_P> Log11Grid(Log11Image.rows, Log11Image.step / 3, (RGB_P*)&Log11Image.data[0]);
-
-		//process images
-		{
-			{
-				UnsharpGrid.multiply(UnsharpMask());
-			}
-			{
-				SobelGrid.sobel();
-			}
-			{
-				mask m = mask::makeLOG(7, 1.4);
-				std::cout << m.toString() << std::endl;
-				Log7Grid.multiply(m);
-			}
-			{
-				mask m = mask::makeLOG(11, 5.0);
-				std::cout << m.toString() << std::endl;
-				Log11Grid.multiply(m);
-			}
-		}
+		imageGrid<RGB_P> UnsharpGrid = originalGrid.multiplyByMask(UnsharpMask());
+		imageGrid<RGB_P> SobelGrid = originalGrid.sobel();
+		imageGrid<RGB_P> Log7Grid = originalGrid.multiplyByMask(m7);
+		imageGrid<RGB_P> Log11Grid = originalGrid.multiplyByMask(m11);
 
 		//commit image changes
 		originalGrid.commitImageGrid((RGB_P*)&originalImage.data[0]);
