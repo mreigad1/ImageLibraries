@@ -4,7 +4,9 @@
 #include "arithmeticalRGB.h"
 #include "arithmeticalHSI.h"
 #include "arithmeticalGreyscale.h"
+#include <iomanip>
 #include <math.h>
+#include <algorithm>
 
 namespace RGBPix {
 	//empty constructor
@@ -289,36 +291,56 @@ namespace RGBPix {
 		return RGBPix::arithmeticalRGB(R(), G(), B());
 	}
 
-	template<typename T>
-	T min(T x, T y) {
-		return (x < y ? x : y);
-	}
-
-	template<typename T>
-	T max(T x, T y) {
-		return (x > y ? x : y);
-	}
-
 	pixelRGB::operator HSIPix::arithmeticalHSI() const {
-
 		PrecisionType H, S, I;
-		PrecisionType r = static_cast<PrecisionType>(R()) / MAX_BYTE;	//intervals [0, 1]
-		PrecisionType g = static_cast<PrecisionType>(G()) / MAX_BYTE;
-		PrecisionType b = static_cast<PrecisionType>(B()) / MAX_BYTE;
-		PrecisionType rn = r / (r + g + b);								//intervals [0, (1/3)]
-		PrecisionType gn = g / (r + g + b);
-		PrecisionType bn = b / (r + g + b);
 
-		H = acos((0.5 * ((rn - gn) + (rn - bn))) / (sqrt((rn - gn) * (rn - gn) + (rn - bn) * (gn - bn))));
-		S = 1 - 3.0 * min(rn, min(gn, bn));
-		I = ( r + g + b ) / 3.0;
+		PrecisionType rn     = 0;
+		PrecisionType gn     = 0;
+		PrecisionType bn     = 0;
+		{
+			const PrecisionType r = static_cast<PrecisionType>(rgb.m_r.value());	//intervals [0, 1]
+			const PrecisionType g = static_cast<PrecisionType>(rgb.m_g.value());
+			const PrecisionType b = static_cast<PrecisionType>(rgb.m_b.value());
+			rn     = r / (r + g + b);
+			gn     = g / (r + g + b);
+			bn     = b / (r + g + b);
+			std:: cout << (rn) << std::endl << std::flush;
+			std:: cout << (gn) << std::endl << std::flush;
+			std:: cout << (bn) << std::endl << std::flush;
+			I = ( r + g + b ) / (3.0 * MAX_BYTE);
+		}
 
-		S = max(S, static_cast<PrecisionType>(0.0));
-		I = max(I, static_cast<PrecisionType>(0.0));
-		S = min(S, static_cast<PrecisionType>(1.0));
-		I = min(I, static_cast<PrecisionType>(1.0));
-		if (H != H)     H = 0;       //handle NaN case
-		if (b > r)      H = tPI - H; //Reflect if g > b
+		S = 1 - 3 * std::min(rn, std::min(gn, bn));
+		H = acos(
+			(0.5 * (rn - gn) + (rn - bn)) / 
+			sqrt((rn - gn) * (rn - gn) + (rn - bn) * (gn - bn))
+		);
+
+		if (!((S >= 0 && S <= 1) && (I >= 0 && I <= 1))) {
+			// std::cout << S << std::endl << std::flush;
+			// std::cout << I << std::endl << std::flush;
+			// std::cout << rn << std::endl << std::flush;
+			// std::cout << gn << std::endl << std::flush;
+			// std::cout << bn << std::endl << std::flush;
+		}
+
+		//ASSERT(S >= 0 && S <= 1);
+		//ASSERT(I >= 0 && I <= 1);
+		//S = std::max(S, static_cast<PrecisionType>(0.0));
+		//I = std::max(I, static_cast<PrecisionType>(0.0));
+		//S = std::min(S, static_cast<PrecisionType>(1.0));
+		//I = std::min(I, static_cast<PrecisionType>(1.0));
+		if (H != H)                         H = 0       ;       //handle NaN case
+		if (bn > gn)                        H = tPI - H ; //Reflect if g > b
+		if (H < 0 && H > -PI_ERROR)         H = 0       ;
+		if (H > tPI && H - tPI < PI_ERROR)  H = tPI     ;
+		while (H < 0)                       H += tPI    ;
+		while (H > tPI)                     H -= tPI    ;
+		if (H < 0   &&      H >  -PI_ERROR) H = 0       ;
+		if (H > tPI && H - tPI <  PI_ERROR) H = tPI     ;
+
+		ASSERT(H >= 0);
+		ASSERT(H <= tPI);
 
 		return HSIPix::arithmeticalHSI(H, S, I);
 	}

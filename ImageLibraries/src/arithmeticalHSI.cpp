@@ -1,4 +1,5 @@
 #include "debug.hpp"
+#include "constants.hpp"
 #include "arithmeticalHSI.h"
 #include <sstream>
 #include <cmath>
@@ -48,16 +49,16 @@ namespace HSIPix {
 
 	arithmeticalHSI arithmeticalHSI::operator+(const arithmeticalHSI& neighbor) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h + neighbor.hsi.m_h;
-		retVal.hsi.m_s = retVal.hsi.m_s + neighbor.hsi.m_s;
+		//retVal.hsi.m_h = retVal.hsi.m_h + neighbor.hsi.m_h;
+		//retVal.hsi.m_s = retVal.hsi.m_s + neighbor.hsi.m_s;
 		retVal.hsi.m_i = retVal.hsi.m_i + neighbor.hsi.m_i;
 		return retVal;
 	}
 
 	arithmeticalHSI arithmeticalHSI::operator-(const arithmeticalHSI& neighbor) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h - neighbor.hsi.m_h;
-		retVal.hsi.m_s = retVal.hsi.m_s - neighbor.hsi.m_s;
+		//retVal.hsi.m_h = retVal.hsi.m_h - neighbor.hsi.m_h;
+		//retVal.hsi.m_s = retVal.hsi.m_s - neighbor.hsi.m_s;
 		retVal.hsi.m_i = retVal.hsi.m_i - neighbor.hsi.m_i;
 		return retVal;
 	}
@@ -67,32 +68,32 @@ namespace HSIPix {
 		ASSERT(0 != neighbor.hsi.m_s.value());
 		ASSERT(0 != neighbor.hsi.m_i.value());
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h / neighbor.hsi.m_h;
-		retVal.hsi.m_s = retVal.hsi.m_s / neighbor.hsi.m_s;
+		//retVal.hsi.m_h = retVal.hsi.m_h / neighbor.hsi.m_h;
+		//retVal.hsi.m_s = retVal.hsi.m_s / neighbor.hsi.m_s;
 		retVal.hsi.m_i = retVal.hsi.m_i / neighbor.hsi.m_i;
 		return retVal;
 	}
 
 	arithmeticalHSI arithmeticalHSI::operator*(const arithmeticalHSI& neighbor) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h * neighbor.hsi.m_h;
-		retVal.hsi.m_s = retVal.hsi.m_s * neighbor.hsi.m_s;
+		//retVal.hsi.m_h = retVal.hsi.m_h * neighbor.hsi.m_h;
+		//retVal.hsi.m_s = retVal.hsi.m_s * neighbor.hsi.m_s;
 		retVal.hsi.m_i = retVal.hsi.m_i * neighbor.hsi.m_i;
 		return retVal;
 	}
 
 	arithmeticalHSI arithmeticalHSI::operator+(const PrecisionType& brightness) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h + brightness;
-		retVal.hsi.m_s = retVal.hsi.m_s + brightness;
+		//retVal.hsi.m_h = retVal.hsi.m_h + brightness;
+		//retVal.hsi.m_s = retVal.hsi.m_s + brightness;
 		retVal.hsi.m_i = retVal.hsi.m_i + brightness;
 		return retVal;
 	}
 	
 	arithmeticalHSI arithmeticalHSI::operator-(const PrecisionType& brightness) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h - brightness;
-		retVal.hsi.m_s = retVal.hsi.m_s - brightness;
+		//retVal.hsi.m_h = retVal.hsi.m_h - brightness;
+		//retVal.hsi.m_s = retVal.hsi.m_s - brightness;
 		retVal.hsi.m_i = retVal.hsi.m_i - brightness;
 		return retVal;
 	}
@@ -100,16 +101,16 @@ namespace HSIPix {
 	arithmeticalHSI arithmeticalHSI::operator/(const PrecisionType& brightness) const {
 		ASSERT(0 != brightness);
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h / brightness;
-		retVal.hsi.m_s = retVal.hsi.m_s / brightness;
+		//retVal.hsi.m_h = retVal.hsi.m_h / brightness;
+		//retVal.hsi.m_s = retVal.hsi.m_s / brightness;
 		retVal.hsi.m_i = retVal.hsi.m_i / brightness;
 		return retVal;
 	}
 
 	arithmeticalHSI arithmeticalHSI::operator*(const PrecisionType& brightness) const {
 		arithmeticalHSI retVal(*this);
-		retVal.hsi.m_h = retVal.hsi.m_h * brightness;
-		retVal.hsi.m_s = retVal.hsi.m_s * brightness;
+		//retVal.hsi.m_h = retVal.hsi.m_h * brightness;
+		//retVal.hsi.m_s = retVal.hsi.m_s * brightness;
 		retVal.hsi.m_i = retVal.hsi.m_i * brightness;
 		return retVal;
 	}
@@ -117,8 +118,8 @@ namespace HSIPix {
 	//return root of this pixel
 	arithmeticalHSI arithmeticalHSI::root() const {
 		arithmeticalHSI retVal;
-		retVal.hsi.m_h = sqrt(H());
-		retVal.hsi.m_s = sqrt(S());
+		//retVal.hsi.m_h = sqrt(H());
+		//retVal.hsi.m_s = sqrt(S());
 		retVal.hsi.m_i = sqrt(I());
 		return retVal;
 	}

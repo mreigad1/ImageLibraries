@@ -29,6 +29,8 @@ namespace HSIPix {
 	//const constructor
 	pixelHSI::pixelHSI(const pixelHSI& other) :
 		pixel<pixelHSI>() {
+			ASSERT(other.H() >= 0);
+			ASSERT(other.H() <= tPI);
 			hsi.m_h = other.hsi.m_h;
 			hsi.m_s = other.hsi.m_s;
 			hsi.m_i = other.hsi.m_i;
@@ -39,6 +41,12 @@ namespace HSIPix {
 		hsi.m_h = other.H();
 		hsi.m_s = other.S();
 		hsi.m_i = other.I();
+		while(H() < 0)   hsi.m_h = hsi.m_h + tPI;
+		while(H() > tPI) hsi.m_h = hsi.m_h - tPI;
+		if (S() < 0)     hsi.m_s = 0;
+		if (S() > 1)     hsi.m_s = 1;
+		if (I() < 0)     hsi.m_i = 0;
+		if (I() > 1)     hsi.m_i = 1;
 	}
 
 	//toString method
@@ -63,6 +71,12 @@ namespace HSIPix {
 		hsi.m_h = other.H();
 		hsi.m_s = other.S();
 		hsi.m_i = other.I();
+		while(H() < 0)   hsi.m_h = hsi.m_h + tPI;
+		while(H() > tPI) hsi.m_h = hsi.m_h - tPI;
+		if (S() < 0)     hsi.m_s = 0;
+		if (S() > 1)     hsi.m_s = 1;
+		if (I() < 0)     hsi.m_i = 0;
+		if (I() > 1)     hsi.m_i = 1;
 		return *this;
 	}
 
@@ -280,18 +294,21 @@ namespace HSIPix {
 		if (s == 0) {
 			r = g = b = i;
 		} else {
-			ASSERT(h >= 0 && h <= tPI);
+			ASSERT(h >= 0);
+			ASSERT(h <= tPI);
 			int caseNum = (h / tPI) * 3;
 
 			h -= (caseNum * (tPI / 3));
 			PrecisionType x, y, z;
 
-			x = (1 - s);
-			y = (1 + (s * cos(h) / cos(PI / 3 - h)));
-			z = (3 - x - y);
+			PrecisionType c = i * MAX_BYTE;
+			x = c * (1 - s);
+			y = c * (1 + (s * cos(h) / cos(PI / 3 - h)));
+			z = c * 3 - (x + y);
 
 			switch (caseNum) {
 				case 0:
+				case 3:	//allowed to be 3 if precisely 2 PI
 					b = x;
 					r = y;
 					g = z;
@@ -307,13 +324,13 @@ namespace HSIPix {
 					r = z;
 				break;
 				default:
+					std::cout << caseNum << std::endl;
 					ASSERT("Error converting HSI to RGB" == nullptr);
 				break;
 			}
 		}
 
-		PrecisionType c = i * MAX_BYTE;
-		return RGBPix::arithmeticalRGB(r*c, g*c, b*c);
+		return RGBPix::arithmeticalRGB(r, g, b);
 	}
 
 	pixelHSI::operator GreyscalePix::arithmeticalGreyscale() const {

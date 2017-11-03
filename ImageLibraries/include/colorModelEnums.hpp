@@ -2,7 +2,7 @@
 
 //define color precision types
 typedef unsigned char byte;
-typedef float PrecisionType;
+typedef double PrecisionType;
 
 //enumerates different types of color models
 enum ColorModel {

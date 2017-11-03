@@ -1,6 +1,8 @@
+#include <math.h>
 #pragma once
-const unsigned int NUM_INTENSITIES = 256;
-const unsigned int        MAX_BYTE = 255;
-const double                   EPS = 2.71828182846;
-const double                    PI = 3.14159265358;
-const double                   tPI = 6.28318530718;
+#define NUM_INTENSITIES  (256)
+#define        MAX_BYTE  (255)
+#define             EPS  (2.718282)
+#define              PI  (M_PI)
+#define             tPI  (2 * M_PI)
+#define        PI_ERROR  (tPI / 1000.0)

@@ -1,3 +1,5 @@
+#include "colorModelEnums.hpp"
+#include "constants.hpp"
 #pragma once
 //This file is only to be included in the ByteIntensity class as an auxillary class
 
@@ -32,6 +34,7 @@ template <ColorIndex Value> class ArithmeticalIntensity {
 		}
 
 		ArithmeticalIntensity& operator=(const PrecisionType other) {
+
 			intensity = other;
 			return *this;
 		}

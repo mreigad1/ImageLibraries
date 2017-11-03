@@ -11,7 +11,7 @@
 		std::cout << "Error at ASSERT(" <<		\
 			STR(X) << ") on line " << __LINE__	\
 			<< " in " << __FILE__				\
-			<< std::endl;						\
+			<< std::endl << std::flush;			\
 		exit(-1);								\
 	}											\
 } while (0)										\
@@ -21,7 +21,8 @@
 	std::cout << "Function " 					\
 		<< __PRETTY_FUNCTION__ << " in file " 	\
 		<< __FILE__ 							\
-		<< " lacks implementation!\n";			\
+		<< " lacks implementation!\n"			\
+		<< std::flush;							\
 	exit(-1);									\
 } while (0)										\
 
@@ -38,11 +39,11 @@ struct scopePrint {
 			if (destructorPrint) {
 				std::cout << "Enter ";
 			}
-			std::cout << fileName << ":" << lineNum << ":" << funcName << std::endl;
+			std::cout << fileName << ":" << lineNum << ":" << funcName << std::endl << std::flush;
 	}
 	~scopePrint() {
 		if (destructorPrint) {
-			std::cout << "Exit  " << fileName << ":" << funcName << std::endl;
+			std::cout << "Exit  " << fileName << ":" << funcName << std::endl << std::flush;
 		}
 	}
 };

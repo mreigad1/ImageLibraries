@@ -73,8 +73,7 @@ template <typename T> class imageGrid {
 			img(other.Height(), other.Width()) {
 				for (unsigned int i = 0; i < h; i++) {
 					for (unsigned int j = 0; j < w; j++) {
-						auto q = img[i][j].Arithmetical();				//arithHSI
-						img[i][j] = static_cast<decltype(q)>(other.getPixel(i, j));
+						img[i][j] = static_cast<decltype(img[i][j].Arithmetical())>(other.getPixel(i, j));
 					}
 				}
 		}
@@ -84,44 +83,6 @@ template <typename T> class imageGrid {
 			w = other.w;
 			img = other.img;
 			return *this;
-		}
-
-		void commitImageGrid(T* old_data) {
-			img.exportContents(old_data);
-		}
-
-		imageGrid toNegative() const {
-			std::function<T(const unsigned int, const unsigned int)> func = 
-				std::bind(
-					&imageGrid<T>::toNegativePixel,
-					this,
-					std::placeholders::_1,
-					std::placeholders::_2
-				);
-			return transformGrid(func);
-		}
-
-		//parent context must bind closure other than coordinates
-		imageGrid transformGrid(std::function<T(const unsigned int, const unsigned int)> func) const {
-			imageGrid retVal = (*this);
-			for (unsigned int y = 0; y < Height(); y++) {
-				for (unsigned int x = 0; x < Width(); x++) {
-					retVal.getPixel(y, x) = func(y, x);
-				}
-			}
-			return retVal;
-		}
-
-		imageGrid operator-(const imageGrid& other) const {
-			std::function<T(const unsigned int, const unsigned int)> func = 
-				std::bind(
-					&imageGrid<T>::subtractPixels,
-					this,
-					std::placeholders::_1,
-					std::placeholders::_2,
-					other
-				);
-			return transformGrid(func);
 		}
 
 		unsigned int Height() const {
@@ -139,6 +100,56 @@ template <typename T> class imageGrid {
 				return outOfBounds;
 			}
 			return img[y][x];
+		}
+
+		void commitImageGrid(T* old_data) {
+			img.exportContents(old_data);
+		}
+
+		//parent context must bind closure other than coordinates
+		imageGrid transformGrid(std::function<T(const unsigned int, const unsigned int)> func) const {
+			imageGrid retVal = (*this);
+			for (unsigned int y = 0; y < Height(); y++) {
+				for (unsigned int x = 0; x < Width(); x++) {
+					retVal.getPixel(y, x) = func(y, x);
+				}
+			}
+			return retVal;
+		}
+
+		imageGrid operator+(const imageGrid& other) const {
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::addPixels,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					other
+				);
+			return transformGrid(func);
+		}
+
+		imageGrid operator-(const imageGrid& other) const {
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::subtractPixels,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					other
+				);
+			return transformGrid(func);
+		}
+
+		imageGrid toNegative() const {
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::toNegativePixel,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2
+				);
+			return transformGrid(func);
 		}
 
 		imageGrid toGrey() const {
@@ -189,8 +200,6 @@ template <typename T> class imageGrid {
 			}
 
 			std::sort(allClusters.begin(), allClusters.end(), clusterCompare);
-			//std::cout << "Size of vector: " << allClusters.size() << std::endl;
-
 			return allClusters;
 		}
 
@@ -202,7 +211,6 @@ template <typename T> class imageGrid {
 				for (auto point : cluster) {
 					img[point.y][point.x] = T(0,0,0);
 				}
-				//std::cout << "size of cluster " << i++ << ":\t" << cluster.size() << std::endl;
 			}
 
 			for (auto biggest : clusters.front()) {
@@ -228,7 +236,6 @@ template <typename T> class imageGrid {
 						img[point.y][point.x] = original.img[point.y][point.x];
 					}
 				}
-				//std::cout << "size of cluster " << i++ << ":\t" << cluster.size() << std::endl;
 			}
 		}
 
@@ -450,16 +457,7 @@ template <typename T> class imageGrid {
 		}
 
 	private:
-		T sobelOperation(const imageGrid& other, const unsigned int y, const unsigned int x) const {
-			return T((img[y][x] * img[y][x] + other.img[y][x] * other.img[y][x]).root());
-		}
-
-		T toBinaryPixel(const unsigned int y, const unsigned int x, const T& thresh) const {
-			return img[y][x].toBinary(thresh);
-		}
-
 		static bool clusterCompare(const std::vector<coordinate>& l, const std::vector<coordinate> r) {
-			//sort largest to smallest
 			return l.size() > r.size();
 		}
 
@@ -530,10 +528,16 @@ template <typename T> class imageGrid {
 			return accum;
 		}
 
+		T addPixels(const unsigned int y, const unsigned int x, const imageGrid& other) const {
+			static const T zeroPixel;
+			const T& otherPix = (y < other.Height() && x < other.Width()) ? other.img[y][x] : zeroPixel;
+			return T(img[y][x] + otherPix);
+		}
+
 		T subtractPixels(const unsigned int y, const unsigned int x, const imageGrid& other) const {
 			static const T zeroPixel;
 			const T& otherPix = (y < other.Height() && x < other.Width()) ? other.img[y][x] : zeroPixel;
-			return img[y][x] - otherPix;
+			return T(img[y][x] - otherPix);
 		}
 
 		T toNegativePixel(const unsigned int y, const unsigned int x) const {
@@ -542,5 +546,13 @@ template <typename T> class imageGrid {
 
 		T toGreyPixel(const unsigned int y, const unsigned int x) const {
 			return img[y][x].toGrey();
+		}
+
+		T sobelOperation(const imageGrid& other, const unsigned int y, const unsigned int x) const {
+			return T((img[y][x] * img[y][x] + other.img[y][x] * other.img[y][x]).root());
+		}
+
+		T toBinaryPixel(const unsigned int y, const unsigned int x, const T& thresh) const {
+			return img[y][x].toBinary(thresh);
 		}
 };
