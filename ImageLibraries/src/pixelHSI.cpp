@@ -291,43 +291,42 @@ namespace HSIPix {
 		i = max(i, static_cast<PrecisionType>(0.0));
 		s = min(s, static_cast<PrecisionType>(1.0));
 		i = min(i, static_cast<PrecisionType>(1.0));
-		if (s == 0) {
-			r = g = b = i;
-		} else {
-			ASSERT(h >= 0);
-			ASSERT(h <= tPI);
-			int caseNum = (h / tPI) * 3;
 
-			h -= (caseNum * (tPI / 3));
-			PrecisionType x, y, z;
+		ASSERT(h >= 0);
+		ASSERT(h <= tPI);
+		int caseNum = (h / tPI) * 3;
 
-			PrecisionType c = i * MAX_BYTE;
-			x = c * (1 - s);
-			y = c * (1 + (s * cos(h) / cos(PI / 3 - h)));
-			z = c * 3 - (x + y);
+		h -= (caseNum * (tPI / 3));
+		PrecisionType x, y, z, divisor;
 
-			switch (caseNum) {
-				case 0:
-				case 3:	//allowed to be 3 if precisely 2 PI
-					b = x;
-					r = y;
-					g = z;
-				break;
-				case 1:
-					r = x;
-					g = y;
-					b = z;
-				break;
-				case 2:
-					g = x;
-					b = y;
-					r = z;
-				break;
-				default:
-					std::cout << caseNum << std::endl;
-					ASSERT("Error converting HSI to RGB" == nullptr);
-				break;
-			}
+		PrecisionType c = i * MAX_BYTE;
+		x = c * (1 - s);
+		divisor = cos((PI / 3) - h) != 0 ? cos((PI / 3) - h) : 1;
+		ASSERT(!isnan(divisor));
+		y = c * (1 + (s * cos(h) / divisor));
+		z = c * 3 - (x + y);
+
+		switch (caseNum) {
+			case 0:
+			case 3:	//allowed to be 3 if precisely 2 PI
+				b = x;
+				r = y;
+				g = z;
+			break;
+			case 1:
+				r = x;
+				g = y;
+				b = z;
+			break;
+			case 2:
+				g = x;
+				b = y;
+				r = z;
+			break;
+			default:
+				std::cout << caseNum << std::endl;
+				ASSERT("Error converting HSI to RGB" == nullptr);
+			break;
 		}
 
 		return RGBPix::arithmeticalRGB(r, g, b);
