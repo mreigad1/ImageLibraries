@@ -1,4 +1,5 @@
-#include "histogram.h"
+#include "histogram.hpp"
+#include "pixelRGB.h"
 
 #ifdef TESTING
 	#define DRIVER main
@@ -10,6 +11,9 @@
 #include <opencv2/highgui/highgui.hpp>
 using namespace std;
 using namespace cv;
+
+typedef RGBPix::pixelRGB RGB_P;
+typedef histogramProcessor<RGB_P> histogram;
 
 int clusteringDriver1(int argc, char **argv) {
 	ASSERT(3 == argc);

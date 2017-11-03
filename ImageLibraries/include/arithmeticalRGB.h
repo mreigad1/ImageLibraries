@@ -34,5 +34,10 @@ namespace RGBPix {
 			PrecisionType R() const;
 			PrecisionType G() const;
 			PrecisionType B() const;
+
+			PrecisionType dataComponent1() const;								//static polymorphic alias for normalized [0,1] R component
+			PrecisionType dataComponent2() const;								//static polymorphic alias for normalized [0,1] G component
+			PrecisionType dataComponent3() const;								//static polymorphic alias for normalized [0,1] B component
+			static arithmeticalRGB denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3);
 	};
 };

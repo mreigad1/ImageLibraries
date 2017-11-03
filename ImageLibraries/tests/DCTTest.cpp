@@ -258,7 +258,7 @@ int main (int argc, char **argv) {
 	bool test = 0;
 	//test |= assignment3::BlockTest();
 	test |= assignment3::partB1(argc, argv);
-	//test |= assignment3::partB2(argc, argv);
-	test |= assignment3::ROI_Driver(argc, argv);
+	test |= assignment3::partB2(argc, argv);
+	//test |= assignment3::ROI_Driver(argc, argv);
 	return test;
 }

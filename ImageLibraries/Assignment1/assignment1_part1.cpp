@@ -1,4 +1,5 @@
-#include "histogram.h"
+#include "histogram.hpp"
+#include "pixelRGB.h"
 
 #ifdef TESTING
 	#define DRIVER main
@@ -10,6 +11,9 @@
 #include <opencv2/highgui/highgui.hpp>
 using namespace std;
 using namespace cv;
+
+typedef RGBPix::pixelRGB RGB_P;
+typedef histogramProcessor<RGB_P> histogram;
 
 int colorInversion(int argc, char **argv) {
 	ASSERT(3 == argc);
@@ -29,14 +33,14 @@ int colorInversion(int argc, char **argv) {
 	//imageGrid<RGB_P> filter_grid = test_grid;
 
 	std::cout << "\nHistogram of Original"; 
-	histogram disp_histogram(test_grid);
-	disp_histogram.display();
+	//histogram disp_histogram(test_grid);
+	//disp_histogram.display();
 
 	test_grid.toNegative();
 
 	std::cout << "\nHistogram after taking negative";
-	histogram disp2_histogram(test_grid);
-	disp2_histogram.display();
+	//histogram disp2_histogram(test_grid);
+	//disp2_histogram.display();
 
 	test_grid.commitImageGrid((RGB_P*)&test_image.data[0]);
 	//filter_grid.commitImageGrid((RGB_P*)&original_image.data[0]);
@@ -61,26 +65,18 @@ int histogramCorrection (int argc, char **argv) {
 	//namedWindow(windowText.c_str());
 
 	imageGrid<RGB_P> test_grid(test_image.rows, test_image.step / 3, (RGB_P*)&test_image.data[0]);
-	test_grid.toGrey();
-	//test_grid.darkMedianFilter();
-	//imageGrid<RGB_P> filter_grid = test_grid;
 
 	std::cout << "\nHistogram of Original"; 
 	histogram disp_histogram(test_grid);
 	disp_histogram.display();
 
-	for (int i = 0; i++ < 2;) {
-		histogram processing_histogram(test_grid);
-		processing_histogram.apply();
-		test_grid.darkMedianFilter();
-	}
+	test_grid = disp_histogram.histogramCorrection();
 
 	std::cout << "\nHistogram after balancing";
 	histogram disp2_histogram(test_grid);
 	disp2_histogram.display();
 
 	test_grid.commitImageGrid((RGB_P*)&test_image.data[0]);
-	//filter_grid.commitImageGrid((RGB_P*)&original_image.data[0]);
 
 	//Display loop
 	bool loop = true;

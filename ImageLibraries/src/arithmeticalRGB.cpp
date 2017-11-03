@@ -5,6 +5,9 @@
 
 namespace RGBPix {
 	arithmeticalRGB::arithmeticalRGB() {
+		rgb.m_r = 0;
+		rgb.m_g = 0;
+		rgb.m_b = 0;
 	}
 
 	arithmeticalRGB::arithmeticalRGB(byte r, byte g, byte b) {
@@ -112,6 +115,22 @@ namespace RGBPix {
 		retVal.rgb.m_g = retVal.rgb.m_g * brightness;
 		retVal.rgb.m_b = retVal.rgb.m_b * brightness;
 		return retVal;
+	}
+
+	PrecisionType arithmeticalRGB::dataComponent1() const {
+		return static_cast<PrecisionType>(rgb.m_r.value()) / 255.0;
+	}
+
+	PrecisionType arithmeticalRGB::dataComponent2() const {
+		return static_cast<PrecisionType>(rgb.m_r.value()) / 255.0;
+	}
+
+	PrecisionType arithmeticalRGB::dataComponent3() const {
+		return static_cast<PrecisionType>(rgb.m_r.value()) / 255.0;
+	}
+
+	arithmeticalRGB arithmeticalRGB::denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
+		return arithmeticalRGB(c1 * 255, c2 * 255, c3 * 255);
 	}
 
 	//return root of this pixel

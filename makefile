@@ -155,7 +155,7 @@ Assignment2_Part1: build_dir move_Assignment2
 	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/basel_gray.bmp
 	./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/ant_gray.bmp
 	#./$(TEST_DIR)/Assignment2 $(ASSETS_DIR)/doge.jpg
-	rm $(TEST_DIR)/Assignment1_Part1
+	rm $(TEST_DIR)/Assignment2
 
 move_tests:
 	mkdir -p $(BUILD_DIR)

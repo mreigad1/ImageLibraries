@@ -10,6 +10,10 @@ namespace RGBPix {
 	//empty constructor
 	pixelRGB::pixelRGB() :
 		pixel<pixelRGB>() {
+			byte intensity = 0;
+			rgb.m_r = intensity;
+			rgb.m_g = intensity;
+			rgb.m_b = intensity;
 	}
 
 	//explicit constructor
