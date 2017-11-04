@@ -14,7 +14,7 @@ CVOPTIONS=${INCLUDE_PATHS} ${LIB_PATHS} ${LIBS}
 BUILD_DIR=build
 TEST_DIR=test
 ASSETS_DIR=ImageLibraries/assets
-BUILD_FLAGS=-Wall -Wfatal-errors -Werror -std=c++11
+BUILD_FLAGS=-Wall -Wfatal-errors -Werror -std=c++11 -O3
 
 all: main
 
@@ -162,12 +162,13 @@ Assignment2_Part1: build_dir move_Assignment2
 	rm $(TEST_DIR)/Assignment2
 
 Assignment3_Part1: build_dir move_Assignment3
-	g++ $(BUILD_DIR)/assignment3.cpp $(BUILD_DIR)/DCT.cpp                      \
+	g++ $(BUILD_DIR)/assignment3.cpp                                           \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/DCT.cpp                             \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
 		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment3
-	./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/Building1.bmp > test.txt
+	./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/basel3.bmp $(ASSETS_DIR)/Building1.bmp $(ASSETS_DIR)/Disk.bmp
 	#./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/Disk.bmp > test.txt
 	rm $(TEST_DIR)/Assignment3
 

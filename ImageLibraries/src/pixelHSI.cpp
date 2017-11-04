@@ -82,69 +82,65 @@ namespace HSIPix {
 
 	//addition operator for pixel primitive
 	arithmeticalHSI pixelHSI::operator+(const pixelHSI& neighbor) const {
-		return arithmeticalHSI(*this) + arithmeticalHSI(neighbor);
+		return static_cast<arithmeticalHSI>(*this) + static_cast<arithmeticalHSI>(neighbor);
 	}
 	
 	//subtraction operator for pixel primitive
 	arithmeticalHSI pixelHSI::operator-(const pixelHSI& neighbor) const {
-		return arithmeticalHSI(*this) - arithmeticalHSI(neighbor);
+		return static_cast<arithmeticalHSI>(*this) - static_cast<arithmeticalHSI>(neighbor);
 	}
 
 	//division operator for integer type
 	arithmeticalHSI pixelHSI::operator/(const pixelHSI& other) const {
-		ASSERT(0 != other.hsi.m_h.value());
-		ASSERT(0 != other.hsi.m_s.value());
 		ASSERT(0 != other.hsi.m_i.value());
-		return arithmeticalHSI(*this) / arithmeticalHSI(other);
+		return static_cast<arithmeticalHSI>(*this) / static_cast<arithmeticalHSI>(other);
 	}
 
 	//multiplication for pixel primitive
 	arithmeticalHSI pixelHSI::operator*(const pixelHSI& other) const {
-		return arithmeticalHSI(*this) * arithmeticalHSI(other);
+		return static_cast<arithmeticalHSI>(*this) * static_cast<arithmeticalHSI>(other);
 	}
 
 	//addition operator for pixel primitive
 	arithmeticalHSI pixelHSI::operator+(const arithmeticalHSI& neighbor) const {
-		return arithmeticalHSI(*this) + neighbor;
+		return static_cast<arithmeticalHSI>(*this) + neighbor;
 	}
 	
 	//subtraction operator for pixel primitive
 	arithmeticalHSI pixelHSI::operator-(const arithmeticalHSI& neighbor) const {
-		return arithmeticalHSI(*this) - neighbor;
+		return static_cast<arithmeticalHSI>(*this) - neighbor;
 	}
 
 	//division operator for integer type
 	arithmeticalHSI pixelHSI::operator/(const arithmeticalHSI& other) const {
-		ASSERT(0 != other.H());
-		ASSERT(0 != other.S());
 		ASSERT(0 != other.I());
-		return arithmeticalHSI(*this) / other;
+		return static_cast<arithmeticalHSI>(*this) / other;
 	}
 
 	//multiplication for pixel primitive
 	arithmeticalHSI pixelHSI::operator*(const arithmeticalHSI& other) const {
-		return arithmeticalHSI(*this) * other;
+		return static_cast<arithmeticalHSI>(*this) * other;
 	}
 
 	//addition operator for integer format brightness
 	arithmeticalHSI pixelHSI::operator+(PrecisionType brightness) const {
-		return arithmeticalHSI(*this) + brightness;
+		return static_cast<arithmeticalHSI>(*this) + brightness;
 	}
 
 	//subtraction operator for pixel primitive
 	arithmeticalHSI pixelHSI::operator-(PrecisionType brightness) const {
-		return arithmeticalHSI(*this) - brightness;
+		return static_cast<arithmeticalHSI>(*this) - brightness;
 	}
 
 	//division operator for integer type
 	arithmeticalHSI pixelHSI::operator/(PrecisionType denom) const {
 		ASSERT(0 != denom);
-		return arithmeticalHSI(*this) / denom;
+		return static_cast<arithmeticalHSI>(*this) / denom;
 	}
 
 	//multiplication for integer scalar
 	arithmeticalHSI pixelHSI::operator*(PrecisionType scalar) const {
-		return arithmeticalHSI(*this) * scalar;
+		return static_cast<arithmeticalHSI>(*this) * scalar;
 	}
 
 	//greater than equal for pixel primitives
@@ -259,7 +255,7 @@ namespace HSIPix {
 		return static_cast<PrecisionType>(I());
 	}
 
-	pixelHSI pixelHSI::denormalized(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
+	pixelHSI pixelHSI::denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3) {
 		return pixelHSI(c1 * tPI, c2, c3);
 	}
 

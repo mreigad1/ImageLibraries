@@ -59,6 +59,10 @@ template<class T> class Array2D {
 
 		//returns address of first item in row
 		T* operator[](const unsigned int k) const {
+			if (k >= Height()) {
+				std::cout << k << std::endl << std::flush;
+				std::cout << Height() << std::endl << std::flush;
+			}
 			ASSERT(k < Height());
 			return &array[k * Width()];
 		}

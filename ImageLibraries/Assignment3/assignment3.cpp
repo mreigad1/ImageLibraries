@@ -13,6 +13,11 @@
 using namespace std;
 using namespace cv;
 
+typedef GreyscalePix::pixelGreyscale GREY_P;
+typedef HSIPix::pixelHSI HSI_P;
+typedef RGBPix::pixelRGB RGB_P;
+typedef histogramProcessor<RGB_P> histogram;
+
 namespace assignment3 {
 
 	int BlockTest() {
@@ -124,7 +129,7 @@ namespace assignment3 {
 
 	int partB2(int argc, char **argv) {
 		//ensure correct args
-		ASSERT(2 == argc);
+		ASSERT(4 == argc);
 		const char* test_file = argv[1];
 
 		std::cout << "\n\nBeginning part B2\n";
@@ -147,27 +152,27 @@ namespace assignment3 {
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
 
 		//construct imageGrids
-		imageGrid<RGBPix::pixelRGB> colorGrid(colorImage.rows, colorImage.step / 3, (RGBPix::pixelRGB*)&colorImage.data[0]);
-		imageGrid<HSIPix::pixelHSI> hsiGrid(colorGrid);
-		imageGrid<GreyscalePix::pixelGreyscale> originalGrid(hsiGrid);
+		imageGrid<RGB_P> colorGrid(colorImage.rows, colorImage.step / 3, (RGBPix::pixelRGB*)&colorImage.data[0]);
+		imageGrid<HSI_P> hsiGrid(colorGrid);
+		imageGrid<GREY_P> originalGrid(hsiGrid);
 
 		//construct DCT's
 		DCTImage dctProcessor(originalGrid);
-		imageGrid<GreyscalePix::pixelGreyscale>   lowDCT_G = dctProcessor.ComputeDct(LOW);
-		imageGrid<GreyscalePix::pixelGreyscale>   medDCT_G = dctProcessor.ComputeDct(MED);
-		imageGrid<GreyscalePix::pixelGreyscale>  fullDCT_G = dctProcessor.ComputeDct(FULL);
-		imageGrid<GreyscalePix::pixelGreyscale>  lowIDCT_G = dctProcessor.ComputeInverseDct(LOW);
-		imageGrid<GreyscalePix::pixelGreyscale>  medIDCT_G = dctProcessor.ComputeInverseDct(MED);
-		imageGrid<GreyscalePix::pixelGreyscale> fullIDCT_G = dctProcessor.ComputeInverseDct(FULL);
+		imageGrid<GREY_P>   lowDCT_G = dctProcessor.ComputeDct(LOW);
+		imageGrid<GREY_P>   medDCT_G = dctProcessor.ComputeDct(MED);
+		imageGrid<GREY_P>  fullDCT_G = dctProcessor.ComputeDct(FULL);
+		imageGrid<GREY_P>  lowIDCT_G = dctProcessor.ComputeInverseDct(LOW);
+		imageGrid<GREY_P>  medIDCT_G = dctProcessor.ComputeInverseDct(MED);
+		imageGrid<GREY_P> fullIDCT_G = dctProcessor.ComputeInverseDct(FULL);
 
 		//commit image changes
-		originalGrid.commitImageGrid((GreyscalePix::pixelGreyscale*)&originalImage.data[0]);
-		fullDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&fullDctProcessedImage.data[0]);
-		fullIDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&fullIdctProcessedImage.data[0]);
-		lowDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&lowDctProcessedImage.data[0]);
-		lowIDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&lowIdctProcessedImage.data[0]);
-		medDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&medDctProcessedImage.data[0]);
-		medIDCT_G.commitImageGrid((GreyscalePix::pixelGreyscale*)&medIdctProcessedImage.data[0]);
+		originalGrid.commitImageGrid ((GREY_P*)&originalImage.data[0]);
+		fullDCT_G.commitImageGrid    ((GREY_P*)&fullDctProcessedImage.data[0]);
+		fullIDCT_G.commitImageGrid   ((GREY_P*)&fullIdctProcessedImage.data[0]);
+		lowDCT_G.commitImageGrid     ((GREY_P*)&lowDctProcessedImage.data[0]);
+		lowIDCT_G.commitImageGrid    ((GREY_P*)&lowIdctProcessedImage.data[0]);
+		medDCT_G.commitImageGrid     ((GREY_P*)&medDctProcessedImage.data[0]);
+		medIDCT_G.commitImageGrid    ((GREY_P*)&medIdctProcessedImage.data[0]);
 
 		//display results
 		imshow(                         "Color Image", colorImage);
@@ -197,9 +202,27 @@ namespace assignment3 {
 		return 0;
 	}
 
-	int ROI_Driver(int argc, char **argv) {
-		ASSERT(2 == argc);
-		const char* test_file = argv[1];
+	const mask& UnsharpMask() {
+		// static PrecisionType arr[] = {
+		// 	-1, -2, -1,
+		// 	-2, 13, -2,
+		// 	-1, -2, -1
+		// };
+		// static mask um(3, arr);
+		static PrecisionType arr[] = {
+			  -1,   -4,   -6,   -4,   -1,
+			  -4,  -16,  -24,  -16,   -4,
+			  -6,  -24,  476,  -24,   -6,
+			  -4,  -16,  -24,  -16,   -4,
+			  -1,   -4,   -6,   -4,   -1,
+		};
+		static mask um(5, arr, 1.0 / 256);
+		return um;
+	}
+
+	int ROI_Driver(int argnum, int argc, char **argv) {
+		ASSERT(4 == argc);
+		const char* test_file = argv[argnum];
 		Mat original_image  = imread(test_file, CV_LOAD_IMAGE_COLOR);
 		Mat clustered_image = imread(test_file, CV_LOAD_IMAGE_COLOR);
 		Mat buffer_img      = imread(test_file, CV_LOAD_IMAGE_COLOR);
@@ -209,35 +232,32 @@ namespace assignment3 {
 
 		//Create the display window
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
-		//namedWindow(windowText.c_str());
+		imageGrid<RGB_P> base_grid(buffer_img.rows, buffer_img.step / 3, (RGB_P*)&buffer_img.data[0]);
+		imageGrid<RGB_P> unmodified_grid(base_grid);
+		auto sb = base_grid.sobel();
+		for (int i = 0; i < 2; i++) {
+			base_grid = base_grid.multiplyByMask(UnsharpMask()) - sb;
+		}
+		imageGrid<HSI_P> test_grid(base_grid);
 
-		imageGrid<RGB_P> test_grid(buffer_img.rows, buffer_img.step / 3, (RGB_P*)&buffer_img.data[0]);
-		imageGrid<RGB_P> stashed_grid(test_grid);
-		test_grid.toGrey();
-		//test_grid.darkMedianFilter();
-		//imageGrid<RGB_P> filter_grid = test_grid;
-
-		std::cout << "\nHistogram of Image"; 
-		histogram disp_histogram(test_grid);
-		disp_histogram.display();
-		const byte thresh = disp_histogram.getMinima();
-		
-		test_grid.toBinary(RGB_P(thresh, thresh, thresh));
-		test_grid.commitImageGrid((RGB_P*)&image_part2.data[0]);
-
-		auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));
-		test_grid.commitImageGrid((RGB_P*)&clustered_image.data[0]);
-
-		test_grid.assignment3Coloring(clusters, stashed_grid);
-		test_grid.commitImageGrid((RGB_P*)&image_part3.data[0]);
+		{
+			PrecisionType low = 25;
+			PrecisionType high = 90;
+			auto thresh = histogram(test_grid, low, high).lowPercentilePixel();
+			test_grid = histogram(test_grid, low, high).histogramCorrection();
+			test_grid = histogram(test_grid).histogramCorrection().toBinary(thresh);
+			auto clusters = histogram(test_grid, 0, 100).histogramCorrection().clusterImage(thresh);
+			test_grid = histogram(test_grid, 0, 100).histogramCorrection().assignment3Coloring(clusters, unmodified_grid);
+			imageGrid<RGB_P>(test_grid).commitImageGrid((RGB_P*)&image_part2.data[0]);
+		}
 
 		//Display loop
 		bool loop = true;
 		while(loop) {
 			imshow("Original image", original_image);
 			imshow("PART 2 Image", image_part2);
-			imshow("Clustered Groups Image", clustered_image);
-			imshow("PART 3 Image", image_part3);
+			//imshow("Part 3 Image", clustered_image);
+			//imshow("PART 4 Image", image_part3);
 
 			switch(cvWaitKey(15)) {
 				case 27:  //Esc key case
@@ -259,6 +279,7 @@ int main (int argc, char **argv) {
 	//test |= assignment3::BlockTest();
 	test |= assignment3::partB1(argc, argv);
 	test |= assignment3::partB2(argc, argv);
-	//test |= assignment3::ROI_Driver(argc, argv);
+	test |= assignment3::ROI_Driver(2, argc, argv);
+	test |= assignment3::ROI_Driver(3, argc, argv);
 	return test;
 }

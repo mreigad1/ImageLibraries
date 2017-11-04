@@ -237,9 +237,10 @@ namespace assignment3 {
 		imageGrid<RGB_P> unmodified_grid(test_grid);
 
 		{
+			test_grid = test_grid.multiplyByMask(UnsharpMask());
 			//test_grid = histogram(test_grid, 20, 90).histogramCorrection();
 			//test_grid = test_grid - test_grid.sobel() - test_grid.sobel();
-			//test_grid = histogram(test_grid, 20, 90).histogramCorrection();
+			//test_grid = histogram(histogram(test_grid, 5, 50).histogramCorrection() - test_grid + (histogram(test_grid, 50, 95).histogramCorrection() ), 5, 95).histogramCorrection();
 			imageGrid<RGB_P>(test_grid).commitImageGrid((RGB_P*)&image_part2.data[0]);
 			//test_grid = unmodified_grid;
 

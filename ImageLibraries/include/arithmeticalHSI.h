@@ -34,5 +34,9 @@ namespace HSIPix {
 			PrecisionType H() const;
 			PrecisionType S() const;
 			PrecisionType I() const;
+
+			PrecisionType dataComponent1() const;								//static polymorphic alias for normalized [0,1] R component
+			PrecisionType dataComponent2() const;								//static polymorphic alias for normalized [0,1] G component
+			PrecisionType dataComponent3() const;								//static polymorphic alias for normalized [0,1] B component
 	};
 };

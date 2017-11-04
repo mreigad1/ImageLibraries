@@ -226,17 +226,19 @@ template <typename T> class imageGrid {
 			}
 		}
 
-		void assignment3Coloring(std::vector<std::vector<coordinate>>& clusters, imageGrid original) {
+		imageGrid assignment3Coloring(std::vector<std::vector<coordinate>>& clusters, imageGrid original) const {
+			imageGrid rv = imageGrid(original.Height(), original.Width());
 			ASSERT(clusters.size() > 2);
 
 			//int i = 0;
 			for (auto cluster : clusters) {
 				for (auto point : cluster) {
 					if (!(static_cast<T>(img[point.y][point.x] * 0) == img[point.y][point.x])) {
-						img[point.y][point.x] = original.img[point.y][point.x];
+						rv.img[point.y][point.x] = original.img[point.y][point.x];
 					}
 				}
 			}
+			return rv;
 		}
 
 		imageGrid multiplyByMask(const mask& _mask) const{
@@ -509,7 +511,7 @@ template <typename T> class imageGrid {
 
 		T multiplyPixelByMask(const unsigned int y, const unsigned int x, const mask& _mask) const {
 			static T dummy;
-			decltype(dummy.Arithmetical()) accum(0, 0, 0);
+			decltype(dummy.Arithmetical()) accum = T(this->img[y][x]) * 0;
 			int off = _mask.Width() / 2;
 			//iterate over all valid pixels in neighborhood
 			for (int y_off = -off; y_off <= off; y_off++) {

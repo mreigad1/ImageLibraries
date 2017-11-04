@@ -65,7 +65,7 @@ namespace HSIPix {
 			PrecisionType dataComponent1() const;								//static polymorphic alias for H [0, 1] component
 			PrecisionType dataComponent2() const;								//static polymorphic alias for S [0, 1] component
 			PrecisionType dataComponent3() const;								//static polymorphic alias for I [0, 1] component
-			static pixelHSI denormalized(PrecisionType c1, PrecisionType c2, PrecisionType c3);	//explicit constructor
+			static pixelHSI denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3);	//explicit constructor
 
 			//cast operators
 			arithmeticalHSI Arithmetical() const;

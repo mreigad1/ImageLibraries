@@ -123,4 +123,17 @@ namespace HSIPix {
 		retVal.hsi.m_i = sqrt(I());
 		return retVal;
 	}
+
+	PrecisionType arithmeticalHSI::dataComponent1() const {
+		return H();
+	}
+
+	PrecisionType arithmeticalHSI::dataComponent2() const {
+		return S();
+	}
+
+	PrecisionType arithmeticalHSI::dataComponent3() const {
+		return I();
+	}
+
 };
