@@ -264,16 +264,18 @@ template <typename T> class imageGrid {
 		// 	*this = buf;
 		// }
 
-		// void dilateBinary(mask& _mask) {
-		// 	imageGrid buf = *this;
-		// 	//iterate over all pixels
-		// 	for (unsigned int i = 0; i < h; i++) {
-		// 		for (unsigned int j = 0; j < w; j++) {
-		// 			buf.img[i][j] = dilatePixelBinary(i, j, _mask);
-		// 		}
-		// 	}
-		// 	*this = buf;
-		// }
+		imageGrid dilateBinary(const mask& _mask, const T& thresh) {
+			imageGrid asBinary = this->toBinary(thresh);
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::dilatePixel, 
+					&asBinary,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					_mask
+				);
+			transformGrid(func);
+		}
 
 		// void erode(mask& _mask) {
 		// 	imageGrid buf = *this;
@@ -286,16 +288,18 @@ template <typename T> class imageGrid {
 		// 	*this = buf;
 		// }
 
-		// void erodeBinary(mask& _mask) {
-		// 	imageGrid buf = *this;
-		// 	//iterate over all pixels
-		// 	for (unsigned int i = 0; i < h; i++) {
-		// 		for (unsigned int j = 0; j < w; j++) {
-		// 			buf.img[i][j] = erodePixelBinary(i, j, _mask);
-		// 		}
-		// 	}
-		// 	*this = buf;
-		// }
+		imageGrid erodeBinary(const mask& _mask, const T& thresh) {
+			imageGrid asBinary = this->toBinary(thresh);
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::erodePixel, 
+					&asBinary,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					_mask
+				);
+			return transformGrid(func);
+		}
 
 		imageGrid sobel() const {
 			PrecisionType sob_x[] = {
@@ -322,78 +326,6 @@ template <typename T> class imageGrid {
 				);
 			return transformGrid(func);
 		}
-
-		// pixel<T> dilatePixel(unsigned int y, unsigned int x, mask& _mask) {
-		// 	pixel<T> retVal(0, 0, 0);
-		// 	int off = _mask.w / 2;
-		// 	//iterate over all valid pixels in neighborhood
-		// 	for (int y_off = -off; y_off <= off; y_off++) {
-		// 		int y_prime = y + y_off;
-		// 		for (int x_off = -off; x_off <= off; x_off++) {
-		// 			int x_prime = x + x_off;
-		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
-		// 				pixel<T> tempPix = img[y_prime][x_prime].toGrey() + _mask.maskVals[y_off + off][x_off + off];
-		// 				retVal = ((retVal > tempPix) ? retVal : tempPix);
-		// 			} 
-		// 		}
-		// 	}
-		// 	return retVal;
-		// }
-
-		// pixel<T> dilatePixelBinary(unsigned int y, unsigned int x, mask& _mask) {
-		// 	pixel<T> retVal(0, 0, 0);
-		// 	int off = _mask.w / 2;
-		// 	//iterate over all valid pixels in neighborhood
-		// 	for (int y_off = -off; y_off <= off; y_off++) {
-		// 		int y_prime = y + y_off;
-		// 		for (int x_off = -off; x_off <= off; x_off++) {
-		// 			int x_prime = x + x_off;
-		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
-		// 				int enable = ((_mask.maskVals[y_off + off][x_off + off] != 0.0) ? 1 : 0);
-		// 				pixel<T> tempPix = img[y_prime][x_prime].toBinary() * enable;
-		// 				retVal = ((tempPix.getAvgIntensity() > 0) ? tempPix : retVal);
-		// 			} 
-		// 		}
-		// 	}
-		// 	return retVal;
-		// }
-
-		// pixel<T> erodePixel(unsigned int y, unsigned int x, mask& _mask) {
-		// 	pixel<T> retVal(MAX_COLOR, MAX_COLOR, MAX_COLOR);
-		// 	int off = _mask.w / 2;
-		// 	//iterate over all valid pixels in neighborhood
-		// 	for (int y_off = -off; y_off <= off; y_off++) {
-		// 		int y_prime = y + y_off;
-		// 		for (int x_off = -off; x_off <= off; x_off++) {
-		// 			int x_prime = x + x_off;
-		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
-		// 				pixel<T> tempPix = img[y_prime][x_prime].toGrey() + (-_mask.maskVals[y_off + off][x_off + off]);
-		// 				retVal = ((retVal < tempPix) ? retVal : tempPix);
-		// 			} 
-		// 		}
-		// 	}
-		// 	return retVal;
-		// }
-
-		// pixel<T> erodePixelBinary(unsigned int y, unsigned int x, mask& _mask) {
-		// 	pixel<T> retVal(MAX_COLOR, MAX_COLOR, MAX_COLOR);
-		// 	int off = _mask.w / 2;
-		// 	//iterate over all valid pixels in neighborhood
-		// 	for (int y_off = -off; y_off <= off; y_off++) {
-		// 		int y_prime = y + y_off;
-		// 		for (int x_off = -off; x_off <= off; x_off++) {
-		// 			int x_prime = x + x_off;
-		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
-		// 				int enable = ((_mask.maskVals[y_off + off][x_off + off] != 0.0) ? 1 : 0);
-		// 				if (enable) {
-		// 					pixel<T> tempPix = img[y_prime][x_prime].toBinary();
-		// 					retVal = ((tempPix.getAvgIntensity() > 0 && retVal.getAvgIntensity() > 0) ? retVal : pixel<T>(0,0,0));
-		// 				}
-		// 			} 
-		// 		}
-		// 	}
-		// 	return retVal;
-		// }
 
 		// //splices two images together with weight factor "other_ratio"
 		// void mixWith(imageGrid& other, double other_ratio) {
@@ -556,5 +488,83 @@ template <typename T> class imageGrid {
 
 		T toBinaryPixel(const unsigned int y, const unsigned int x, const T& thresh) const {
 			return img[y][x].toBinary(thresh);
+		}
+
+		// pixel<T> dilatePixel(unsigned int y, unsigned int x, mask& _mask) {
+		// 	pixel<T> retVal(0, 0, 0);
+		// 	int off = _mask.w / 2;
+		// 	//iterate over all valid pixels in neighborhood
+		// 	for (int y_off = -off; y_off <= off; y_off++) {
+		// 		int y_prime = y + y_off;
+		// 		for (int x_off = -off; x_off <= off; x_off++) {
+		// 			int x_prime = x + x_off;
+		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
+		// 				pixel<T> tempPix = img[y_prime][x_prime].toGrey() + _mask.maskVals[y_off + off][x_off + off];
+		// 				retVal = ((retVal > tempPix) ? retVal : tempPix);
+		// 			} 
+		// 		}
+		// 	}
+		// 	return retVal;
+		// }
+
+		// pixel<T> erodePixel(unsigned int y, unsigned int x, mask& _mask) {
+		// 	pixel<T> retVal(MAX_COLOR, MAX_COLOR, MAX_COLOR);
+		// 	int off = _mask.w / 2;
+		// 	//iterate over all valid pixels in neighborhood
+		// 	for (int y_off = -off; y_off <= off; y_off++) {
+		// 		int y_prime = y + y_off;
+		// 		for (int x_off = -off; x_off <= off; x_off++) {
+		// 			int x_prime = x + x_off;
+		// 			if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
+		// 				pixel<T> tempPix = img[y_prime][x_prime].toGrey() + (-_mask.maskVals[y_off + off][x_off + off]);
+		// 				retVal = ((retVal < tempPix) ? retVal : tempPix);
+		// 			} 
+		// 		}
+		// 	}
+		// 	return retVal;
+		// }
+
+		T dilatePixelBinary(unsigned int y, unsigned int x, const mask& _mask) const {
+			T retVal();
+			int off = _mask.w / 2;
+			//iterate over all valid pixels in neighborhood
+			for (int y_off = -off; y_off <= off; y_off++) {
+				int y_prime = y + y_off;
+				for (int x_off = -off; x_off <= off; x_off++) {
+					int x_prime = x + x_off;
+					if (x_prime >= 0 && x_prime < w && y_prime >= 0 && y_prime < h) {
+						int enable = ((_mask.maskVals[y_off + off][x_off + off] != 0.0) ? 1 : 0);
+						pixel<T> tempPix = img[y_prime][x_prime].toBinary() * enable;
+						retVal = ((tempPix.getAvgIntensity() > 0) ? tempPix : retVal);
+					} 
+				}
+			}
+			return retVal;
+		}
+
+		T erodePixelBinary(unsigned int y, unsigned int x, const mask& _mask) const {
+			T retVal(MAX_BYTE, MAX_BYTE, MAX_BYTE);
+			const int off = _mask.w / 2;
+			//iterate over all valid pixels in neighborhood
+			for (int y_off = -off; y_off <= off; y_off++) {
+				const unsigned int y_prime = y + y_off;
+
+				for (int x_off = -off; x_off <= off; x_off++) {
+					const unsigned int x_prime = x + x_off;
+
+					if (x_prime < w && y_prime < h) {
+						const PrecisionType b_xy = _mask.getMaskData()[y_off + off][x_off + off];
+						const bool enable = (b_xy >= 0.0);
+						
+						if (enable) {
+							T neighborIncremented = img[y_prime][x_prime] + b_xy;
+							if (neighborhood < retVal) {
+								retVal = ((tempPix.getAvgIntensity() > 0 && retVal.getAvgIntensity() > 0) ? retVal : T(0,0,0));
+							}
+						}
+					} 
+				}
+			}
+			return retVal;
 		}
 };
