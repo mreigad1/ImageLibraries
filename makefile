@@ -14,7 +14,7 @@ CVOPTIONS=${INCLUDE_PATHS} ${LIB_PATHS} ${LIBS}
 BUILD_DIR=build
 TEST_DIR=test
 ASSETS_DIR=ImageLibraries/assets
-BUILD_FLAGS=-Wall -Wfatal-errors -Werror -std=c++11 -O3
+BUILD_FLAGS=-Wall -Wfatal-errors -Werror -std=c++11 -O0
 
 all: main
 
@@ -31,6 +31,8 @@ Assignment1:	Assignment1_Part1	\
 Assignment2:	Assignment2_Part1	\
 
 Assignment3:	Assignment3_Part1	\
+
+Assignment4:	Assignment4_Part1	\
 
 perform_test: 	debugTest			\
 				Array2DTest			\
@@ -172,6 +174,16 @@ Assignment3_Part1: build_dir move_Assignment3
 	#./$(TEST_DIR)/Assignment3 $(ASSETS_DIR)/Disk.bmp > test.txt
 	rm $(TEST_DIR)/Assignment3
 
+Assignment4_Part1: build_dir move_Assignment4
+	g++ $(BUILD_DIR)/assignment4.cpp                                           \
+		$(BUILD_DIR)/mask.cpp                                                  \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment4
+	./$(TEST_DIR)/Assignment4 $(ASSETS_DIR)/pigsEven.bmp
+	rm $(TEST_DIR)/Assignment4
+
 move_tests:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(TEST_DIR)
@@ -188,6 +200,10 @@ move_Assignment2:
 move_Assignment3:
 	mkdir -p $(BUILD_DIR)
 	cp ImageLibraries/Assignment3/* $(BUILD_DIR)
+
+move_Assignment4:
+	mkdir -p $(BUILD_DIR)
+	cp ImageLibraries/Assignment4/* $(BUILD_DIR)
 
 build_dir:
 	mkdir -p $(BUILD_DIR)
