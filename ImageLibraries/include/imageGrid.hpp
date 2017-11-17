@@ -163,7 +163,7 @@ template <typename T> class imageGrid {
 			return transformGrid(func);
 		}
 
-		std::vector<std::vector<coordinate>> clusterImage(const T& thresh) {
+		std::vector<std::vector<coordinate>> clusterImage(const T& thresh) const {
 			std::vector<std::vector<coordinate>> allClusters;
 			Array2D<bool> traversed(h, w);
 			traversed.unsafe_erase();
@@ -175,7 +175,7 @@ template <typename T> class imageGrid {
 					if (img[i][j] > thresh) {
 						auto cl = memberCluster(j, i, traversed);
 
-						const unsigned int arbitrarySizeThresh = std::min(h,w) / 4;
+						const unsigned int arbitrarySizeThresh = (h * w) / 512.0;
 
 						//store new cluster to structure
 						if (cl.size() <= arbitrarySizeThresh) {
@@ -203,27 +203,30 @@ template <typename T> class imageGrid {
 			return allClusters;
 		}
 
-		void assignment1Coloring(std::vector<std::vector<coordinate>>& clusters) {
+		imageGrid assignment1Coloring(std::vector<std::vector<coordinate>>& clusters) const {
 			ASSERT(clusters.size() > 2);
+			imageGrid rv = *this;
 
 			//int i = 0;
 			for (auto cluster : clusters) {
 				for (auto point : cluster) {
-					img[point.y][point.x] = T(0,0,0);
+					rv.img[point.y][point.x] = T(0,0,0);
 				}
 			}
 
 			for (auto biggest : clusters.front()) {
-				img[biggest.y][biggest.x] = T(0xFF, 0, 0);
+				rv.img[biggest.y][biggest.x] = T(0xFF, 0, 0);
 			}
 
 			for (auto medium : clusters[clusters.size() / 2]) {
-				img[medium.y][medium.x] = T(0, 0xFF, 0);
+				rv.img[medium.y][medium.x] = T(0, 0xFF, 0);
 			}
 
 			for (auto smallest : clusters.back()) {
-				img[smallest.y][smallest.x] = T(0, 0, 0xFF);
+				rv.img[smallest.y][smallest.x] = T(0, 0, 0xFF);
 			}
+
+			return rv;
 		}
 
 		imageGrid assignment3Coloring(std::vector<std::vector<coordinate>>& clusters, imageGrid original) const {
@@ -253,7 +256,7 @@ template <typename T> class imageGrid {
 			return transformGrid(func);
 		}
 
-		imageGrid dilate(const mask& _mask) {
+		imageGrid dilate(const mask& _mask) const {
 			std::function<T(const unsigned int, const unsigned int)> func = 
 				std::bind(
 					&imageGrid<T>::dilatePixel, 
@@ -265,7 +268,7 @@ template <typename T> class imageGrid {
 			return transformGrid(func);
 		}
 
-		imageGrid erode(const mask& _mask) {
+		imageGrid erode(const mask& _mask) const {
 			std::function<T(const unsigned int, const unsigned int)> func = 
 				std::bind(
 					&imageGrid<T>::erodePixel,
@@ -371,7 +374,7 @@ template <typename T> class imageGrid {
 			return l.size() > r.size();
 		}
 
-		std::vector<coordinate> memberCluster(unsigned int x, unsigned int y, Array2D<bool>& traversed) {
+		std::vector<coordinate> memberCluster(unsigned int x, unsigned int y, Array2D<bool>& traversed) const {
 			std::vector<coordinate> retVals;
 			const byte clusteringThreshold = 10;
 

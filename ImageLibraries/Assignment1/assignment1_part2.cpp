@@ -44,7 +44,7 @@ int clusteringDriver1(int argc, char **argv) {
 	auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));
 	test_grid.commitImageGrid((RGB_P*)&clustered_image.data[0]);
 
-	test_grid.assignment1Coloring(clusters);
+	test_grid = test_grid.assignment1Coloring(clusters);
 	test_grid.commitImageGrid((RGB_P*)&image_part3.data[0]);
 
 	//Display loop
@@ -100,7 +100,7 @@ int clusteringDriver2(int argc, char **argv) {
 	auto clusters = test_grid.clusterImage(RGB_P(thresh,thresh,thresh));
 	test_grid.commitImageGrid((RGB_P*)&clustered_image.data[0]);
 
-	test_grid.assignment1Coloring(clusters);
+	test_grid = test_grid.assignment1Coloring(clusters);
 	test_grid.commitImageGrid((RGB_P*)&image_part3.data[0]);
 
 	//Display loop
