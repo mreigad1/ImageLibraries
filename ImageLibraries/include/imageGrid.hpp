@@ -5,34 +5,11 @@
 #include "pixel.hpp"
 #include "colorModelEnums.hpp"
 #include "colorModelTypes.hpp"
+#include "coordinate.h"
 #include <vector>
 #include <algorithm>
 #include <functional>
 #include <typeinfo>
-
-#ifndef IG_CODE_DEF
-	struct coordinate {
-		unsigned int x;
-		unsigned int y;
-
-		coordinate(unsigned int _x, unsigned int _y) : 
-			x(_x),
-			y(_y) {
-		}
-
-		coordinate(const coordinate& other) :
-			x(other.x),
-			y(other.y) {
-		}
-
-		coordinate& operator=(const coordinate& other) {
-			x = other.x;
-			y = other.y;
-			return *this;
-		}
-	};
-#endif
-#define IG_CODE_DEF
 
 //imageGrid stores a copy of an imageGrid to be operated upon and allows copying
 //back to imageGrid buffer following operations

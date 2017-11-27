@@ -34,6 +34,9 @@ Assignment3:	Assignment3_Part1	\
 
 Assignment4:	Assignment4_Part1	\
 
+
+Assignment5:	Assignment5_Part1	\
+
 perform_test: 	debugTest			\
 				Array2DTest			\
 				ByteIntensityTest	\
@@ -184,6 +187,16 @@ Assignment4_Part1: build_dir move_Assignment4
 	./$(TEST_DIR)/Assignment4 $(ASSETS_DIR)/pigsEven.bmp
 	rm $(TEST_DIR)/Assignment4
 
+Assignment5_Part1: build_dir move_Assignment5
+	g++ $(BUILD_DIR)/assignment5.cpp                                           \
+		$(BUILD_DIR)/mask.cpp                                                  \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5
+	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/pigsEven.bmp
+	rm $(TEST_DIR)/Assignment5
+
 move_tests:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(TEST_DIR)
@@ -204,6 +217,10 @@ move_Assignment3:
 move_Assignment4:
 	mkdir -p $(BUILD_DIR)
 	cp ImageLibraries/Assignment4/* $(BUILD_DIR)
+
+move_Assignment5:
+	mkdir -p $(BUILD_DIR)
+	cp ImageLibraries/Assignment5/* $(BUILD_DIR)
 
 build_dir:
 	mkdir -p $(BUILD_DIR)
