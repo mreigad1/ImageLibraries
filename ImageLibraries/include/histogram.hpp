@@ -29,7 +29,7 @@ template <typename PixType> class histogramProcessor {
 				hPercentile(highPercentile/100.0) {
 
 					//initialize pdf
-					for (unsigned int i = 0; i < MAX_BYTE; i++) {
+					for (unsigned int i = 0; i <= MAX_BYTE; i++) {
 						pdf[i] = ArithPix();
 					}
 
@@ -161,7 +161,7 @@ template <typename PixType> class histogramProcessor {
 
 				PrecisionType sum = 0;
 				ss << "\n\nComponent 1 Histogram (round off error present):\n";
-				for (unsigned int i = 0; i < MAX_BYTE; i++) {
+				for (unsigned int i = 0; i <= MAX_BYTE; i++) {
 					ss << std::setfill ('0') << std::setw(3) << i << " : ";
 					sum += pdf[i].dataComponent1();
 					ss << std::setfill ('0') << std::setw(5) << static_cast<int>(pdf[i].dataComponent1() * (MAX_BYTE * 1.0));
@@ -169,14 +169,14 @@ template <typename PixType> class histogramProcessor {
 				}
 
 				ss << "\n\nComponent 2 Histogram (round off error present):\n";
-				for (unsigned int i = 0; i < MAX_BYTE; i++) {
+				for (unsigned int i = 0; i <= MAX_BYTE; i++) {
 					ss << std::setfill ('0') << std::setw(3) << i << " : ";
 					ss << std::setfill ('0') << std::setw(5) << static_cast<int>(pdf[i].dataComponent2() * (MAX_BYTE * 1.0));
 					ss << "\n";
 				}
 
 				ss << "\n\nComponent 3 Histogram (round off error present):\n";
-				for (unsigned int i = 0; i < MAX_BYTE; i++) {
+				for (unsigned int i = 0; i <= MAX_BYTE; i++) {
 					ss << std::setfill ('0') << std::setw(3) << i << " : ";
 					ss << std::setfill ('0') << std::setw(5) << static_cast<int>(pdf[i].dataComponent3() * (MAX_BYTE * 1.0));
 					ss << "\n";

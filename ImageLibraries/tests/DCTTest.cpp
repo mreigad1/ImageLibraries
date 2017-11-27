@@ -6,6 +6,7 @@
 #include "pixelRGB.h"
 #include "imageGrid.hpp"
 #include "DCT.h"
+#include "block.h"
 #include "histogram.hpp"
 #include <vector>
 #include <iomanip>

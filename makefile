@@ -101,7 +101,7 @@ PixelConversionTest: build_dir move_tests
 	rm $(TEST_DIR)/PixelConversionTest
 
 DCTTest: build_dir move_tests
-	g++ $(BUILD_DIR)/DCTTest.cpp                                               \
+	g++ $(BUILD_DIR)/DCTTest.cpp $(BUILD_DIR)/block.cpp                        \
 		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/DCT.cpp                             \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
@@ -135,7 +135,7 @@ HistogramTest: build_dir move_tests
 	rm $(TEST_DIR)/HistogramTest
 
 Assignment1_Part2: build_dir move_Assignment1
-	g++ $(BUILD_DIR)/assignment1_part2.cpp                                     \
+	g++ $(BUILD_DIR)/assignment1_part2.cpp $(BUILD_DIR)/coordinate.cpp         \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
@@ -167,8 +167,8 @@ Assignment2_Part1: build_dir move_Assignment2
 	rm $(TEST_DIR)/Assignment2
 
 Assignment3_Part1: build_dir move_Assignment3
-	g++ $(BUILD_DIR)/assignment3.cpp                                           \
-		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/DCT.cpp                             \
+	g++ $(BUILD_DIR)/assignment3.cpp $(BUILD_DIR)/coordinate.cpp               \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/DCT.cpp $(BUILD_DIR)/block.cpp      \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
@@ -179,7 +179,7 @@ Assignment3_Part1: build_dir move_Assignment3
 
 Assignment4_Part1: build_dir move_Assignment4
 	g++ $(BUILD_DIR)/assignment4.cpp                                           \
-		$(BUILD_DIR)/mask.cpp                                                  \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/coordinate.cpp                      \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
@@ -189,12 +189,13 @@ Assignment4_Part1: build_dir move_Assignment4
 
 Assignment5_Part1: build_dir move_Assignment5
 	g++ $(BUILD_DIR)/assignment5.cpp                                           \
-		$(BUILD_DIR)/mask.cpp                                                  \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/coordinate.cpp                      \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
 		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5
-	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/pigsEven.bmp
+	#./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/pigsEven.bmp
+	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/soccer.jpeg
 	rm $(TEST_DIR)/Assignment5
 
 move_tests:

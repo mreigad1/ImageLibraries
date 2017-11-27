@@ -1,95 +1,72 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "debug.hpp"
-#include "pixelGreyscale.h"
 #include "pixelRGB.h"
 #include "imageGrid.hpp"
-#include "histogram.hpp"
+#include "motionVectorMap.hpp"
+#include "block.h"
 #include <vector>
 #include <iomanip>
 
 using namespace std;
 using namespace cv;
 
-typedef GreyscalePix::pixelGreyscale GREY_P;
 typedef RGBPix::pixelRGB RGB_P;
-typedef histogramProcessor<RGB_P> histogram;
 
-namespace assignment4 {
+namespace assignment5 {
 
 	const mask& structuringElement() {
 		static PrecisionType arr[] = {
-			-1,  0,  2,  0, -1,
-			 0,  4,  8,  4,  0,
-			 2,  8,  2,  8,  2,
-			 0,  4,  8,  4,  0,
-			-1,  0,  2,  0, -1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
 		};
 		static mask um(5, arr);
 		return um;
 	}
 
-	const mask& unsharpMask() {
-		static PrecisionType arr[] = {
-			  -1,   -4,   -6,   -4,   -1,
-			  -4,  -16,  -24,  -16,   -4,
-			  -6,  -24,  476,  -24,   -6,
-			  -4,  -16,  -24,  -16,   -4,
-			  -1,   -4,   -6,   -4,   -1,
-		};
-		static mask um(5, arr, 1.0 / 256);
-		return um;
-	}
-
 	int driver(int argc, char **argv) {
 		//ensure correct args
-		ASSERT(2 == argc);
-		const char* test_file = argv[1];
+		ASSERT(3 == argc);
+		const char* frame_1 = argv[1];
+		const char* frame_2 = argv[2];
 
 		std::cout << "\n\nBeginning assignment 4\n";
 		std::cout << std::flush;
 
 		//setup all displayable images
-		Mat colorImage = imread(test_file,  CV_LOAD_IMAGE_COLOR);
-		Mat greyImage = imread(test_file, CV_LOAD_IMAGE_COLOR);
+		Mat colorFrame1 = imread(frame_1,  CV_LOAD_IMAGE_COLOR);
+		Mat colorFrame2 = imread(frame_2,  CV_LOAD_IMAGE_COLOR);
+		Mat motionFrame = imread(frame_2,  CV_LOAD_IMAGE_COLOR);
 
 		//ensure all images are valid
-		ASSERT(nullptr != colorImage.data);
-		ASSERT(nullptr != greyImage.data);
+		ASSERT(nullptr != colorFrame1.data);
+		ASSERT(nullptr != colorFrame2.data);
+		ASSERT(nullptr != motionFrame.data);
 
 		//Windowing text
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
 
 		//construct imageGrids
-		imageGrid<RGB_P> colorGrid(colorImage.rows, colorImage.step / 3, (RGBPix::pixelRGB*)&colorImage.data[0]);
-		imageGrid<GREY_P> greyGrid(colorGrid);
+		imageGrid<RGB_P> colorGrid(colorFrame1.rows, colorFrame1.step / 3, (RGBPix::pixelRGB*)&colorFrame1.data[0]);
 
-		//convert back to RGB
-		colorGrid = greyGrid;
-
-
-		colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
-		colorGrid = colorGrid.multiplyByMask(unsharpMask());
-		//colorGrid = colorGrid - colorGrid.sobel();
-		colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
-
-		auto smoothed      = colorGrid.erode(structuringElement()).dilate(structuringElement()) + colorGrid.dilate(structuringElement()).erode(structuringElement());
-		auto morphGradient = colorGrid.dilate(structuringElement()) - colorGrid.erode(structuringElement());
-		auto topHat        = colorGrid - colorGrid.erode(structuringElement()).dilate(structuringElement());
-		auto textSeg       = smoothed.toBinary(histogramProcessor<RGB_P>(smoothed).binaryThreshold());
-		auto myAlg = colorGrid - (textSeg + smoothed).toNegative() + (smoothed - (morphGradient + topHat) - (morphGradient + topHat));//.erode(structuringElement()).dilate(structuringElement());
-		//auto myAlg2 = (((colorGrid - myAlg) + (smoothed - myAlg)) - morphGradient); 
-		colorGrid = myAlg;
+		bool attempt = false;
+		const int sliceSize = 8;
+		auto subImages = colorGrid.subImages(sliceSize);
 
 
-		//colorGrid = colorGrid.toBinary(histogramProcessor<RGB_P>(colorGrid).binaryThreshold());
 
-		//commit image changes
-		colorGrid.commitImageGrid ((RGB_P*)&greyImage.data[0]);
+
+		std::cout << "Was a " << (attempt ? std::string("success") : std::string("failure")) << std::endl;
+
+		colorGrid.commitImageGrid ((RGB_P*)&colorFrame1.data[0]);
 
 		//display results
-		imshow(        "Color Image", colorImage);
-		imshow("Intensity Image (I)", greyImage);
+		imshow("Frame 1 Image", colorFrame1);
+		imshow("Frame 2 Image", colorFrame2);
+		imshow( "Motion Image", motionFrame);
 
 		//Display loop
 		bool loop = true;
@@ -112,6 +89,6 @@ namespace assignment4 {
 
 int main (int argc, char **argv) {
 	bool test = 0;
-	test |= assignment4::driver(argc, argv);
+	test |= assignment5::driver(argc, argv);
 	return test;
 }

@@ -79,6 +79,96 @@ template <typename T> class imageGrid {
 			return img[y][x];
 		}
 
+		Array2D<imageGrid<T>> subImages(const unsigned width) const {
+			const unsigned heightRemainder = Height() % width;
+			const unsigned widthRemainder =  Width() % width;
+
+			const unsigned sliceHeight = (Height() / width) + (heightRemainder ? 1 : 0);
+			const unsigned  sliceWidth = (Width() / width)  + ( widthRemainder ? 1 : 0);
+
+			Array2D<imageGrid<T>> rv(sliceHeight, sliceWidth);
+
+			//for each sliced subimage tile
+			for (unsigned int i = 0; i < sliceHeight; i++) {
+				const unsigned tileHeightOffset = i * width;
+				const unsigned tileHeight = (i + 1 != sliceHeight && heightRemainder) ? width : heightRemainder;
+				for (unsigned int j = 0; j < sliceWidth; j++) {
+					const unsigned tileWidthOffset = j * width;
+					const unsigned tileWidth  = (j + 1 != sliceWidth && widthRemainder) ? width : widthRemainder ;
+
+					//size-out the subimage tile
+					rv[i][j] = imageGrid<T>(tileHeight, tileWidth);
+
+					//copy each pixel into subimage
+					for (unsigned int internal_y = 0; internal_y < tileHeight; internal_y++) {
+						for (unsigned int internal_x = 0; internal_x < tileWidth; internal_x++) {
+							rv[i][j].getPixel(internal_y, internal_x) = getPixel(internal_y + tileHeightOffset, internal_x + tileWidthOffset);
+						}
+					}
+				}
+			}
+
+			return rv;
+		}
+
+		//will write failure to bool if non-null pointer and if subimage grid size-fails
+		static imageGrid<T> fromSubImageGrid(const Array2D<imageGrid<T>>& imageMatrix, bool* success = NULL) {
+			bool checkDimensions = true;
+			unsigned int totalHeight = imageMatrix[0][0].Height();
+			unsigned int totalWidth = imageMatrix[0][0].Width();
+
+			for (unsigned int i = 1; i < imageMatrix.Height(); i++) {
+				totalHeight += imageMatrix[i][0].Height();
+				totalWidth = imageMatrix[i][0].Width();
+
+				for (unsigned int j = 1; j < imageMatrix.Width(); j++) {
+					totalWidth += imageMatrix[0][j].Width();
+					if (imageMatrix[i][j].Width() != imageMatrix[i-1][j].Width()) {
+						checkDimensions = false;
+					}
+					if (imageMatrix[i][j].Height() != imageMatrix[i][j-1].Height()) {
+						checkDimensions = false;
+					}
+				}
+			}
+
+			if (false == checkDimensions) {
+				if (NULL != success) {
+					*success = checkDimensions;
+				}
+				return imageGrid<T>();
+			}
+
+			imageGrid<T> rv(totalHeight, totalWidth);
+
+			//inspect block dimensions
+			const unsigned int blockHeight = imageMatrix[0][0].Height();
+			const unsigned int blockWidth = imageMatrix[0][0].Width();
+
+			//for each block
+			for (unsigned int i = 0; i < imageMatrix.Height(); i++) {
+				const unsigned tileHeightOffset = i * blockHeight;
+				for (unsigned int j = 0; j < imageMatrix.Width(); j++) {
+					const unsigned tileWidthOffset = j * blockWidth;
+
+					//for each pixel in block
+					for (unsigned int internal_y = 0; internal_y < imageMatrix[i][j].Height(); internal_y++) {
+						for (unsigned int internal_x = 0; internal_x < imageMatrix[i][j].Width(); internal_x++) {
+
+							//copy pixel contents into rv
+							rv.getPixel(tileHeightOffset + internal_y, tileWidthOffset + internal_x) = imageMatrix[i][j].getPixel(internal_y, internal_x);
+						}
+					}
+				}
+			}
+
+			if (NULL != success) {
+				*success = true;
+			}
+
+			return rv;
+		}
+
 		void commitImageGrid(T* old_data) {
 			img.exportContents(old_data);
 		}
@@ -283,6 +373,18 @@ template <typename T> class imageGrid {
 			return transformGrid(func);
 		}
 
+		imageGrid toBinary(const T& thresh) const {
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid::toBinaryPixel,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					thresh
+				);
+			return transformGrid(func);
+		}
+
 		// //splices two images together with weight factor "other_ratio"
 		// void mixWith(imageGrid& other, double other_ratio) {
 		// 	int min_w = MIN(other.w, w);
@@ -333,18 +435,6 @@ template <typename T> class imageGrid {
 		// 		}
 		// 	}
 		// }
-
-		imageGrid toBinary(const T& thresh) const {
-			std::function<T(const unsigned int, const unsigned int)> func = 
-				std::bind(
-					&imageGrid::toBinaryPixel,
-					this,
-					std::placeholders::_1,
-					std::placeholders::_2,
-					thresh
-				);
-			return transformGrid(func);
-		}
 
 	private:
 		static bool clusterCompare(const std::vector<coordinate>& l, const std::vector<coordinate> r) {

@@ -2,11 +2,13 @@
 #ifndef IG_CODE_DEF
 	class coordinate {
 		public:
-			const unsigned int x;
-			const unsigned int y;
+			const long long x;
+			const long long y;
 
-			coordinate(unsigned int _x, unsigned int _y);
+			coordinate(long long _x, long long _y);
 			coordinate(const coordinate& other);
+
+			//only way to overwrite const quality above
 			coordinate& operator=(const coordinate& other);
 	};
 #endif
