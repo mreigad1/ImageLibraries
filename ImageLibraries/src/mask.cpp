@@ -5,6 +5,8 @@
 #include <math.h>
 #include <sstream>
 
+#define             EPS  (2.718282)
+
 mask::mask() : 
 	w(0), 
 	maskVals() {

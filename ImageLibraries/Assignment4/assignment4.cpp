@@ -19,11 +19,11 @@ namespace assignment4 {
 
 	const mask& structuringElement() {
 		static PrecisionType arr[] = {
-			-1,  0,  2,  0, -1,
-			 0,  4,  8,  4,  0,
-			 2,  8,  2,  8,  2,
-			 0,  4,  8,  4,  0,
-			-1,  0,  2,  0, -1,
+			-1,  0,  4,  0, -1,
+			 0,  8,  6,  4,  0,
+			 4,  6,  8,  6,  4,
+			 0,  4,  6,  8,  0,
+			-1,  0,  4,  0, -1,
 		};
 		static mask um(5, arr);
 		return um;
@@ -52,6 +52,8 @@ namespace assignment4 {
 		//setup all displayable images
 		Mat colorImage = imread(test_file,  CV_LOAD_IMAGE_COLOR);
 		Mat greyImage = imread(test_file, CV_LOAD_IMAGE_COLOR);
+		Mat binImage = imread(test_file, CV_LOAD_IMAGE_COLOR);
+		Mat clusteredImage = imread(test_file, CV_LOAD_IMAGE_COLOR);
 
 		//ensure all images are valid
 		ASSERT(nullptr != colorImage.data);
@@ -65,31 +67,54 @@ namespace assignment4 {
 		imageGrid<GREY_P> greyGrid(colorGrid);
 
 		//convert back to RGB
-		colorGrid = greyGrid;
+		//colorGrid = greyGrid;
 
-
-		colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
-		colorGrid = colorGrid.multiplyByMask(unsharpMask());
+		//colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
+		//colorGrid = colorGrid.multiplyByMask(unsharpMask());
 		//colorGrid = colorGrid - colorGrid.sobel();
-		colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
+		//colorGrid = histogramProcessor<RGB_P>(colorGrid).histogramCorrection();
 
-		auto smoothed      = colorGrid.erode(structuringElement()).dilate(structuringElement()) + colorGrid.dilate(structuringElement()).erode(structuringElement());
-		auto morphGradient = colorGrid.dilate(structuringElement()) - colorGrid.erode(structuringElement());
-		auto topHat        = colorGrid - colorGrid.erode(structuringElement()).dilate(structuringElement());
-		auto textSeg       = smoothed.toBinary(histogramProcessor<RGB_P>(smoothed).binaryThreshold());
-		auto myAlg = colorGrid - (textSeg + smoothed).toNegative() + (smoothed - (morphGradient + topHat) - (morphGradient + topHat));//.erode(structuringElement()).dilate(structuringElement());
-		//auto myAlg2 = (((colorGrid - myAlg) + (smoothed - myAlg)) - morphGradient); 
-		colorGrid = myAlg;
+		// auto binMask       = colorGrid.toBinary(histogramProcessor<RGB_P>(colorGrid).binaryThreshold()).toNegative();
+		// auto eroded        = colorGrid.erode(structuringElement());
+		// auto dilated       = colorGrid.dilate(structuringElement());
 
+		// auto morphGradient = dilated - eroded;
+		// auto topHat        = colorGrid - eroded;
+		// auto opening       = eroded.dilate(structuringElement());
+		// auto closing       = dilated.erode(structuringElement());
+		// auto smoothed      = opening + closing;
 
-		//colorGrid = colorGrid.toBinary(histogramProcessor<RGB_P>(colorGrid).binaryThreshold());
+		// auto morphMask     = morphGradient.toBinary(histogramProcessor<RGB_P>(morphGradient).binaryThreshold());
+		// auto textSeg       = smoothed.toBinary(histogramProcessor<RGB_P>(smoothed).binaryThreshold());
+		// auto myAlg         = smoothed - (morphMask + binMask);
+
+		// colorGrid = topHat + topHat.dilate(structuringElement()) + morphGradient;
+
+		for (int i = 0; i < 3; i++) {
+			auto eroded        = colorGrid.erode(structuringElement());
+			auto dilated       = colorGrid.dilate(structuringElement());
+			auto morphGradient = dilated - eroded;
+			auto topHat        = colorGrid - eroded;
+			auto opening       = eroded.dilate(structuringElement());
+			colorGrid = (opening - morphGradient);
+		}
+
+		auto thresh = histogramProcessor<RGB_P>(colorGrid).binaryThreshold();
+		auto binGrid = colorGrid.toBinary(thresh);
+		auto clusteredGrid = binGrid;
+		auto clustCount = clusteredGrid.clusterImage(thresh).size();
+		std::cout << "There are " << clustCount << " pig clusters in image.\n";
 
 		//commit image changes
 		colorGrid.commitImageGrid ((RGB_P*)&greyImage.data[0]);
+		binGrid.commitImageGrid ((RGB_P*)&binImage.data[0]);
+		clusteredGrid.commitImageGrid ((RGB_P*)&clusteredImage.data[0]);
 
 		//display results
-		imshow(        "Color Image", colorImage);
-		imshow("Intensity Image (I)", greyImage);
+		imshow(       "Original Image", colorImage);
+		imshow(        "Morphed Image", greyImage);
+		imshow("Bin Thresholded Morph", binImage);
+		imshow("Grouped Objects Image", clusteredImage);
 
 		//Display loop
 		bool loop = true;
