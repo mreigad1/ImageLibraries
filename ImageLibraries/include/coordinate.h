@@ -5,6 +5,7 @@
 			const long long x;
 			const long long y;
 
+			coordinate();
 			coordinate(long long _x, long long _y);
 			coordinate(const coordinate& other);
 

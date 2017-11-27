@@ -50,18 +50,27 @@ namespace assignment5 {
 		string windowText = string("Window from ") + __FILE__ + ":" + __FUNCTION__;
 
 		//construct imageGrids
-		imageGrid<RGB_P> colorGrid(colorFrame1.rows, colorFrame1.step / 3, (RGBPix::pixelRGB*)&colorFrame1.data[0]);
+		imageGrid<RGB_P> colorGrid1(colorFrame1.rows, colorFrame1.step / 3, (RGBPix::pixelRGB*)&colorFrame1.data[0]);
+		imageGrid<RGB_P> colorGrid2(colorFrame2.rows, colorFrame2.step / 3, (RGBPix::pixelRGB*)&colorFrame2.data[0]);
 
 		bool attempt = false;
 		const int sliceSize = 8;
-		auto subImages = colorGrid.subImages(sliceSize);
+		auto subImages1 = colorGrid1.subImages(sliceSize);
+		auto subImages2 = colorGrid2.subImages(sliceSize);
 
+		for (unsigned int i = 0; i < subImages1.Height(); i++) {
+			for (unsigned int j = 0; j < subImages1.Width(); j++) {
+				coordinate c = motionVectorMap<RGB_P>::process(subImages1[i][j], subImages2[i][j], structuringElement());
+				std::cout << "(" << c.y << ", " << c.x << ")\n";
+				subImages1[i][j] = subImages1[i][j].toMotionDisplay(c);
+			}
+		}
 
-
+		colorGrid1 = imageGrid<RGB_P>::fromSubImageGrid(subImages1, &attempt);
 
 		std::cout << "Was a " << (attempt ? std::string("success") : std::string("failure")) << std::endl;
 
-		colorGrid.commitImageGrid ((RGB_P*)&colorFrame1.data[0]);
+		colorGrid1.commitImageGrid ((RGB_P*)&motionFrame.data[0]);
 
 		//display results
 		imshow("Frame 1 Image", colorFrame1);

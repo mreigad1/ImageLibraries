@@ -20,8 +20,10 @@ template <typename PixType> class motionVectorMap {
 	Array2D<coordinate> bestNeighbors;
 
 	public:
-		static imageGrid<PixType> process(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) {
-
+		//forces user context to make only temporary objects, processing directives to be received
+		//and state to be maintained internally only
+		static coordinate process(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) {
+			return motionVectorMap<PixType>(img0, img1, neighbors).getAverageMotionVector();
 		}
 
 
@@ -31,9 +33,9 @@ template <typename PixType> class motionVectorMap {
 		}
 
 		motionVectorMap(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) :
+			neighborhood(neighbors),
 			I0(img0),
 			I1(img1),
-			neighborhood(neighbors),
 			bestNeighbors(img0.Height(), img0.Width()) {
 		}
 
@@ -68,15 +70,9 @@ template <typename PixType> class motionVectorMap {
 			return rv;
 		}
 
-		//forces user context to make only temporary objects, processing directives to be received
-		//and state to be maintained internally only
-		static motionVectorMap<PixType> create(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) {
-			return motionVectorMap<PixType>(img0, img1, neighbors);
-		}
-
 		//calculates each pixel's translation coordinates
 		//then averages the coordinate translations within the image
-		coordinate getAverageMotionVector() {
+		coordinate getAverageMotionVector() const {
 			long long x = 0;
 			long long y = 0;
 			unsigned long long size = bestNeighbors.Height() * bestNeighbors.Width();

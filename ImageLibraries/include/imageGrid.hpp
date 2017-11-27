@@ -169,6 +169,18 @@ template <typename T> class imageGrid {
 			return rv;
 		}
 
+		imageGrid toMotionDisplay(const coordinate& motionVector) const {
+			std::function<T(const unsigned int, const unsigned int)> func = 
+				std::bind(
+					&imageGrid<T>::scaleByVector,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					motionVector
+				);
+			return transformGrid(func);
+		}
+
 		void commitImageGrid(T* old_data) {
 			img.exportContents(old_data);
 		}
@@ -588,5 +600,15 @@ template <typename T> class imageGrid {
 				}
 			}
 			return retVal;
+		}
+
+		T scaleByVector(unsigned int y, unsigned int x, const coordinate& motionVector) const {
+			const int midPtY = Height() / 2;
+			const int midPtX =  Width() / 2;
+			const int delta_y = y - midPtY;
+			const int delta_x = x - midPtX;
+			PrecisionType scaleFactor = motionVector.x * delta_x + motionVector.y * delta_y;
+			scaleFactor = (scaleFactor > 0) ? scaleFactor : 0;
+			return getPixel(y,x) * scaleFactor;
 		}
 };

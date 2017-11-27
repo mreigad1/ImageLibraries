@@ -141,4 +141,29 @@ namespace RGBPix {
 		retVal.rgb.m_b = sqrt(B());
 		return retVal;
 	}
+
+	bool arithmeticalRGB::operator<=(const arithmeticalRGB& neighbor) const {
+		const PrecisionType mySum = R() + G() + B();
+		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		return (mySum <= theirSum);
+	}
+
+	bool arithmeticalRGB::operator<(const arithmeticalRGB& neighbor) const {
+		const PrecisionType mySum = R() + G() + B();
+		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		return (mySum < theirSum);		
+	}
+
+	bool arithmeticalRGB::operator>=(const arithmeticalRGB& neighbor) const {
+		const PrecisionType mySum = R() + G() + B();
+		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		return (mySum >= theirSum);
+	}
+
+	bool arithmeticalRGB::operator>(const arithmeticalRGB& neighbor) const {
+		const PrecisionType mySum = R() + G() + B();
+		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		return (mySum > theirSum);
+	}
+
 };

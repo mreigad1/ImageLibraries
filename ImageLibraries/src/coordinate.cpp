@@ -1,5 +1,10 @@
 #include "coordinate.h"
 
+coordinate::coordinate() : 
+	x(0),
+	y(0) {
+}
+
 coordinate::coordinate(long long _x, long long _y) : 
 	x(_x),
 	y(_y) {
