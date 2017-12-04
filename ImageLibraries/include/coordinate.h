@@ -1,9 +1,13 @@
 #pragma once
 #ifndef IG_CODE_DEF
 	class coordinate {
+
+		long long raw_x;
+		long long raw_y;
+
 		public:
-			const long long x;
-			const long long y;
+			const long long& x;
+			const long long& y;
 
 			coordinate();
 			coordinate(long long _x, long long _y);

@@ -143,27 +143,37 @@ namespace RGBPix {
 	}
 
 	bool arithmeticalRGB::operator<=(const arithmeticalRGB& neighbor) const {
-		const PrecisionType mySum = R() + G() + B();
-		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		const PrecisionType mySum = absSum();
+		const PrecisionType theirSum = neighbor.absSum();
 		return (mySum <= theirSum);
 	}
 
 	bool arithmeticalRGB::operator<(const arithmeticalRGB& neighbor) const {
-		const PrecisionType mySum = R() + G() + B();
-		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		const PrecisionType mySum = absSum();
+		const PrecisionType theirSum = neighbor.absSum();
 		return (mySum < theirSum);		
 	}
 
 	bool arithmeticalRGB::operator>=(const arithmeticalRGB& neighbor) const {
-		const PrecisionType mySum = R() + G() + B();
-		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		const PrecisionType mySum = absSum();
+		const PrecisionType theirSum = neighbor.absSum();
 		return (mySum >= theirSum);
 	}
 
 	bool arithmeticalRGB::operator>(const arithmeticalRGB& neighbor) const {
-		const PrecisionType mySum = R() + G() + B();
-		const PrecisionType theirSum = neighbor.R() + neighbor.G() + neighbor.B();
+		const PrecisionType mySum = absSum();
+		const PrecisionType theirSum = neighbor.absSum();
 		return (mySum > theirSum);
 	}
 
+	PrecisionType arithmeticalRGB::absSum() const {
+		auto aR = abs(R());
+		auto aG = abs(G());
+		auto aB = abs(B());
+		return aR + aG +aB;
+	}
+
+	arithmeticalRGB arithmeticalRGB::Arithmetical() const {
+		return arithmeticalRGB(*this);
+	}
 };

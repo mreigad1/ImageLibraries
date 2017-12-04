@@ -8,6 +8,15 @@
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
+#include <vector>
+
+bool sortByX(coordinate c1, coordinate c2) {
+	return c1.x < c2.x;
+}
+
+bool sortByY(coordinate c1, coordinate c2) {
+	return c1.y < c2.y;
+}
 
 //class is designed to process an entire image for a single vector
 //image will need to be broken into subimages before processing for
@@ -20,10 +29,42 @@ template <typename PixType> class motionVectorMap {
 	Array2D<coordinate> bestNeighbors;
 
 	public:
-		//forces user context to make only temporary objects, processing directives to be received
-		//and state to be maintained internally only
-		static coordinate process(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) {
-			return motionVectorMap<PixType>(img0, img1, neighbors).getAverageMotionVector();
+		static Array2D<coordinate> motionEstimation(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors, const int blockWidth) {
+			auto cdf0 = img0.windowedCDF(blockWidth);
+			auto cdf1 = img1.windowedCDF(blockWidth);
+			auto translationImage = process(cdf0, cdf1, neighbors);
+
+			//for each sub block in image
+			for (unsigned int i = 0; i < translationImage.Height(); i += blockWidth) {
+				for (unsigned int j = 0; j < translationImage.Width(); j += blockWidth) {
+
+					//get container of coordinate translations
+					std::vector<coordinate> blockCoords;
+					for (unsigned int sub_i = 0; sub_i < blockWidth && (i + sub_i) < translationImage.Height(); sub_i++) {
+						for (unsigned int sub_j = 0; sub_j < blockWidth && (j + sub_j) < translationImage.Width(); sub_j++) {
+							blockCoords.push_back(translationImage[i + sub_i][j + sub_j]);
+						}
+					}
+
+					//get median change vector
+					const int mdPt = blockCoords.size() / 2;
+					std::sort(blockCoords.begin(), blockCoords.end(), sortByX);
+					const int med_x = -blockCoords[mdPt].x;
+					std::sort(blockCoords.begin(), blockCoords.end(), sortByY);
+					const int med_y = -blockCoords[mdPt].y;
+					coordinate medianVec(med_x, med_y);
+
+					std::cout << "(" << med_x << ", " << med_y << ")\n";
+
+					//overwrite block vector with median translation vector
+					for (unsigned int sub_i = 0; sub_i < blockWidth && (i + sub_i) < translationImage.Height(); sub_i++) {
+						for (unsigned int sub_j = 0; sub_j < blockWidth && (j + sub_j) < translationImage.Width(); sub_j++) {
+							translationImage[i + sub_i][j + sub_j] = medianVec;
+						}
+					}
+				}
+			}
+			return translationImage;
 		}
 
 
@@ -36,13 +77,19 @@ template <typename PixType> class motionVectorMap {
 			neighborhood(neighbors),
 			I0(img0),
 			I1(img1),
-			bestNeighbors(img0.Height(), img0.Width()) {
+			bestNeighbors(I0.Height(), I0.Width()) {
+		}
+
+		//forces user context to make only temporary objects, processing directives to be received
+		//and state to be maintained internally only
+		static Array2D<coordinate> process(const imageGrid<PixType>& img0, const imageGrid<PixType>& img1, const mask& neighbors) {
+			return motionVectorMap<PixType>(img0, img1, neighbors).getCoordTranslations();
 		}
 
 		coordinate setCoord(unsigned int y, unsigned int x) const {
-			const unsigned int off = neighborhood.Width() / 2;
+			const int off = neighborhood.Width() / 2;
 
-			decltype(I0.getPixel(0,0).Arithmetical()) diff = I0.getPixel(y,x) - I1.getPixel(y,x);
+			PixType diff = I1.getPixel(y,x) - I0.getPixel(y,x);
 			coordinate rv(0,0);
 
 			//for each mask component
@@ -51,17 +98,20 @@ template <typename PixType> class motionVectorMap {
 
 					//if valid mask component
 					if (neighborhood.getMaskData()[i][j] != 0) {
-						const unsigned int i_prime = i - off;
-						const unsigned int j_prime = j - off;
+						const int y_off = i - off;
+						const int x_off = j - off;
+
+						const int y_prime = y - y_off;
+						const int x_prime = x - x_off;
 
 						//if pixel in image range
-						if (i_prime < I0.Height() && j_prime < I0.Width()) {
+						if (y_prime >= 0 && x_prime >= 0 &&  y_prime < I1.Height() && x_prime < I1.Width()) {
 
-							decltype(I0.getPixel(0,0).Arithmetical()) tmpDiff = (I0.getPixel(y,x) - I1.getPixel(i_prime, j_prime));
+							PixType tmpDiff = (I1.getPixel(y,x) - I0.getPixel(y_prime, x_prime));
 
-							if (tmpDiff <= diff) {
+							if (tmpDiff < diff) {
 								diff = tmpDiff;
-								rv = coordinate(j, i);
+								rv = coordinate(x_off, y_off);
 							}
 						}
 					}
@@ -72,20 +122,14 @@ template <typename PixType> class motionVectorMap {
 
 		//calculates each pixel's translation coordinates
 		//then averages the coordinate translations within the image
-		coordinate getAverageMotionVector() const {
-			long long x = 0;
-			long long y = 0;
-			unsigned long long size = bestNeighbors.Height() * bestNeighbors.Width();
+		Array2D<coordinate> getCoordTranslations() const {
 			for (unsigned int i = 0; i < bestNeighbors.Height(); i++) {
 				for (unsigned int j = 0; j < bestNeighbors.Width(); j++) {
 					bestNeighbors[i][j] = setCoord(i, j);
-					x += bestNeighbors[i][j].x;
-					y += bestNeighbors[i][j].y;
 				}
 			}
-			x = static_cast<long long>((static_cast<double>(x) / size) + 0.5);
-			y = static_cast<long long>((static_cast<double>(y) / size) + 0.5);
-			return coordinate(x, y);
+
+			return bestNeighbors;
 		}
 };
 

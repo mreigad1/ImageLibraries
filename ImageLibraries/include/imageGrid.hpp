@@ -72,11 +72,89 @@ template <typename T> class imageGrid {
 
 		T& getPixel(const unsigned int y, const unsigned int x) const {
 			static T outOfBounds;
-			outOfBounds = T();	//always reset to empty pixel
 			if (x >= img.Width() || y >= img.Height()) {
+				outOfBounds = T();	//always reset to empty pixel before returning
 				return outOfBounds;
 			}
 			return img[y][x];
+		}
+
+		#define ARITH_TYPE decltype(T().Arithmetical())
+			imageGrid<ARITH_TYPE> cdf() const {
+				imageGrid<ARITH_TYPE> rv(*this);
+
+				//sum right
+				std::function<ARITH_TYPE(const unsigned int, const unsigned int)> cdf1 = 
+					std::bind(
+						&imageGrid<ARITH_TYPE>::sumRight,
+						&rv,
+						std::placeholders::_1,
+						std::placeholders::_2
+					);
+				rv = rv.transformGrid(cdf1);
+
+				//sum down
+				std::function<ARITH_TYPE(const unsigned int, const unsigned int)> cdf2 = 
+					std::bind(
+						&imageGrid<ARITH_TYPE>::sumDown,
+						&rv,
+						std::placeholders::_1,
+						std::placeholders::_2
+					);
+				rv = rv.transformGrid(cdf2);
+
+				return rv;
+			}
+
+			//integrates toward the right
+			T sumRight(const unsigned int y, const unsigned int x) const {
+				 getPixel(y, x) = getPixel(y, x) + getPixel(y, x - 1); //state must be written to original copy for dynamic programming
+				 return getPixel(y, x);
+			}
+
+			//integrates downward
+			T sumDown(const unsigned int y, const unsigned int x) const {
+				 getPixel(y, x) = getPixel(y, x) + getPixel(y - 1, x); //state must be written to original copy for dynamic programming
+				 return getPixel(y, x);
+			}
+
+			T getMotionCompensated(const imageGrid<T>& previousFrame, const Array2D<coordinate>& translations, const unsigned y, const unsigned x) const {
+				T rv = getPixel(y,x) - previousFrame.getPixel(y + translations[y][x].y, x + translations[y][x].x);
+				return rv;
+			}
+
+			//takes p(y,x) - p(y,x-w) - p(y-w,x) +p(y-w,x-w) to get windowed integration
+			T getWindowedCDF(const unsigned int y, const unsigned x, const int windowWidth) const {
+				T rv = getPixel(y, x) - (getPixel(y, x - windowWidth) + getPixel(y - windowWidth, x) - getPixel(y - windowWidth, x - windowWidth));
+				return rv;
+			}
+
+			imageGrid<ARITH_TYPE> windowedCDF(const int windowWidth) const {
+				imageGrid<ARITH_TYPE> rv = this->cdf();
+				std::function<ARITH_TYPE(const unsigned int, const unsigned int)> windCDF = 
+					std::bind(
+						&imageGrid<ARITH_TYPE>::getWindowedCDF,
+						&rv,
+						std::placeholders::_1,
+						std::placeholders::_2,
+						windowWidth
+					);
+				rv = rv.transformGrid(windCDF);
+				return rv;
+			}
+		#undef ARITH_TYPE
+
+		imageGrid<T> motionCompensated(const imageGrid<T>& previousFrame, const Array2D<coordinate>& translations) const {
+				std::function<T(const unsigned int, const unsigned int)> motionCompensator = 
+					std::bind(
+						&imageGrid<T>::getMotionCompensated,
+						this,
+						previousFrame,
+						translations,
+						std::placeholders::_1,
+						std::placeholders::_2
+					);
+				return transformGrid(motionCompensator);
 		}
 
 		Array2D<imageGrid<T>> subImages(const unsigned width) const {
@@ -91,10 +169,10 @@ template <typename T> class imageGrid {
 			//for each sliced subimage tile
 			for (unsigned int i = 0; i < sliceHeight; i++) {
 				const unsigned tileHeightOffset = i * width;
-				const unsigned tileHeight = (i + 1 != sliceHeight && heightRemainder) ? width : heightRemainder;
+				const unsigned tileHeight = (((i + 1) == sliceHeight && heightRemainder) ? heightRemainder : width);
 				for (unsigned int j = 0; j < sliceWidth; j++) {
 					const unsigned tileWidthOffset = j * width;
-					const unsigned tileWidth  = (j + 1 != sliceWidth && widthRemainder) ? width : widthRemainder ;
+					const unsigned tileWidth  = (((j + 1) == sliceWidth && widthRemainder) ? widthRemainder : width);
 
 					//size-out the subimage tile
 					rv[i][j] = imageGrid<T>(tileHeight, tileWidth);

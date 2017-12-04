@@ -1,22 +1,28 @@
 #include "coordinate.h"
 
 coordinate::coordinate() : 
-	x(0),
-	y(0) {
+	raw_x(0),
+	raw_y(0),
+	x(raw_x),
+	y(raw_y) {
 }
 
 coordinate::coordinate(long long _x, long long _y) : 
-	x(_x),
-	y(_y) {
+	raw_x(_x),
+	raw_y(_y),
+	x(raw_x),
+	y(raw_y) {
 }
 
 coordinate::coordinate(const coordinate& other) :
-	x(other.x),
-	y(other.y) {
+	raw_x(other.x),
+	raw_y(other.y),
+	x(raw_x),
+	y(raw_y) {
 }
 
 coordinate& coordinate::operator=(const coordinate& other) {
-	const_cast<long long&>(x) = other.x;
-	const_cast<long long&>(y) = other.y;
+	raw_x = other.x;
+	raw_y = other.y;
 	return *this;
 }

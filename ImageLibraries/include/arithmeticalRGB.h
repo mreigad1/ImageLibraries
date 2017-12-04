@@ -40,9 +40,12 @@ namespace RGBPix {
 			bool operator>=(const arithmeticalRGB& neighbor)     const;
 			bool  operator>(const arithmeticalRGB& neighbor)     const;
 
+			PrecisionType absSum() const;
+
 			PrecisionType dataComponent1() const;								//static polymorphic alias for normalized [0,1] R component
 			PrecisionType dataComponent2() const;								//static polymorphic alias for normalized [0,1] G component
 			PrecisionType dataComponent3() const;								//static polymorphic alias for normalized [0,1] B component
+			arithmeticalRGB Arithmetical() const;
 			static arithmeticalRGB denormalize(PrecisionType c1, PrecisionType c2, PrecisionType c3);
 	};
 };

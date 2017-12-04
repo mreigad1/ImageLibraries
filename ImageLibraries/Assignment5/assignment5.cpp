@@ -17,13 +17,17 @@ namespace assignment5 {
 
 	const mask& structuringElement() {
 		static PrecisionType arr[] = {
-			1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1
 		};
-		static mask um(5, arr);
+		static mask um(9, arr);
 		return um;
 	}
 
@@ -40,6 +44,7 @@ namespace assignment5 {
 		Mat colorFrame1 = imread(frame_1,  CV_LOAD_IMAGE_COLOR);
 		Mat colorFrame2 = imread(frame_2,  CV_LOAD_IMAGE_COLOR);
 		Mat motionFrame = imread(frame_2,  CV_LOAD_IMAGE_COLOR);
+		Mat diffFrame = imread(frame_2,  CV_LOAD_IMAGE_COLOR);
 
 		//ensure all images are valid
 		ASSERT(nullptr != colorFrame1.data);
@@ -53,29 +58,20 @@ namespace assignment5 {
 		imageGrid<RGB_P> colorGrid1(colorFrame1.rows, colorFrame1.step / 3, (RGBPix::pixelRGB*)&colorFrame1.data[0]);
 		imageGrid<RGB_P> colorGrid2(colorFrame2.rows, colorFrame2.step / 3, (RGBPix::pixelRGB*)&colorFrame2.data[0]);
 
-		bool attempt = false;
-		const int sliceSize = 8;
-		auto subImages1 = colorGrid1.subImages(sliceSize);
-		auto subImages2 = colorGrid2.subImages(sliceSize);
+		Array2D<coordinate> movementVectors = motionVectorMap<RGB_P>::motionEstimation(colorGrid1, colorGrid2, structuringElement(), 8);
+		imageGrid<RGB_P> motionComp = colorGrid2.motionCompensated(colorGrid1, movementVectors);
+		imageGrid<RGB_P> imageDiff = colorGrid2 - colorGrid1;
 
-		for (unsigned int i = 0; i < subImages1.Height(); i++) {
-			for (unsigned int j = 0; j < subImages1.Width(); j++) {
-				coordinate c = motionVectorMap<RGB_P>::process(subImages1[i][j], subImages2[i][j], structuringElement());
-				std::cout << "(" << c.y << ", " << c.x << ")\n";
-				subImages1[i][j] = subImages1[i][j].toMotionDisplay(c);
-			}
-		}
+		//std::cout << "Was a " << (attempt ? std::string("success") : std::string("failure")) << std::endl;
 
-		colorGrid1 = imageGrid<RGB_P>::fromSubImageGrid(subImages1, &attempt);
-
-		std::cout << "Was a " << (attempt ? std::string("success") : std::string("failure")) << std::endl;
-
-		colorGrid1.commitImageGrid ((RGB_P*)&motionFrame.data[0]);
+		motionComp.commitImageGrid ((RGB_P*)&motionFrame.data[0]);
+		imageDiff.commitImageGrid ((RGB_P*)&diffFrame.data[0]);
 
 		//display results
 		imshow("Frame 1 Image", colorFrame1);
 		imshow("Frame 2 Image", colorFrame2);
 		imshow( "Motion Image", motionFrame);
+		imshow( "Difference Image", diffFrame);
 
 		//Display loop
 		bool loop = true;
