@@ -107,4 +107,12 @@ namespace GreyscalePix {
 	PrecisionType arithmeticalGreyscale::dataComponent3() const {
 		return static_cast<PrecisionType>(I() / 255.0);
 	}
+
+	arithmeticalGreyscale  arithmeticalGreyscale::Arithmetical() const {
+		return arithmeticalGreyscale(*this);
+	}
+
+	PrecisionType arithmeticalGreyscale::getAvgIntensity() const {
+		return I();
+	}
 };

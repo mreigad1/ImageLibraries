@@ -30,5 +30,7 @@ namespace GreyscalePix {
 			PrecisionType dataComponent1() const;											//static polymorphic alias for I [0.0, 1.0]
 			PrecisionType dataComponent2() const;											//static polymorphic alias for I [0.0, 1.0]
 			PrecisionType dataComponent3() const;											//static polymorphic alias for I [0.0, 1.0]
+			arithmeticalGreyscale Arithmetical() const;
+			PrecisionType getAvgIntensity() const;
 	};
 };

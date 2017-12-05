@@ -36,6 +36,7 @@ Assignment4:	Assignment4_Part1	\
 
 
 Assignment5:	Assignment5_Part1	\
+				Assignment5_Part2	\
 
 perform_test: 	debugTest			\
 				Array2DTest			\
@@ -188,16 +189,26 @@ Assignment4_Part1: build_dir move_Assignment4
 	rm $(TEST_DIR)/Assignment4
 
 Assignment5_Part1: build_dir move_Assignment5
-	g++ $(BUILD_DIR)/assignment5.cpp                                           \
+	g++ $(BUILD_DIR)/Assignment5_Part1.cpp                                     \
 		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/coordinate.cpp                      \
 		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
-		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5
-	#./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/Pong1.bmp $(ASSETS_DIR)/Pong2.bmp
-	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/Tennis1.bmp $(ASSETS_DIR)/Tennis2.bmp
-	#./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/doge.png $(ASSETS_DIR)/doge2.png
-	rm $(TEST_DIR)/Assignment5
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5_Part1
+	./$(TEST_DIR)/Assignment5_Part1 $(ASSETS_DIR)/pigsEven.bmp
+	rm $(TEST_DIR)/Assignment5_Part1
+
+Assignment5_Part2: build_dir move_Assignment5
+	g++ $(BUILD_DIR)/Assignment5_Part2.cpp                                     \
+		$(BUILD_DIR)/mask.cpp $(BUILD_DIR)/coordinate.cpp                      \
+		$(BUILD_DIR)/pixelGreyscale.cpp $(BUILD_DIR)/arithmeticalGreyscale.cpp \
+		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
+		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5_Part2
+	#./$(TEST_DIR)/Assignment5_Part2 $(ASSETS_DIR)/Pong1.bmp $(ASSETS_DIR)/Pong2.bmp
+	./$(TEST_DIR)/Assignment5_Part2 $(ASSETS_DIR)/Tennis1.bmp $(ASSETS_DIR)/Tennis2.bmp
+	#./$(TEST_DIR)/Assignment5_Part2 $(ASSETS_DIR)/doge.png $(ASSETS_DIR)/doge2.png
+	rm $(TEST_DIR)/Assignment5_Part2
 
 move_tests:
 	mkdir -p $(BUILD_DIR)

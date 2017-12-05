@@ -210,6 +210,56 @@ template <typename T> class imageGrid {
 			return rv;
 		}
 
+		PrecisionType getAverageImageIntensity() const {
+			PrecisionType rv = 0;
+			for (unsigned i = 0; i < Height(); i++) {
+				for (unsigned j = 0; j < Width(); j++) {
+					rv += (getPixel(i,j).getAvgIntensity());
+				}
+			}
+			rv /= (Height() * Width());
+			return rv;
+		}
+
+		PrecisionType getAverageDifference(const imageGrid<T>& other) const {
+			int min_h = std::min(Height(), other.Height());
+			int min_w = std::min(Width(), other.Width());
+			PrecisionType diff = 0;
+			for (int i = 0; i < min_h; i++) {
+				for (int j = 0; j < min_w; j++) {
+					T pixDiff = getPixel(i, j) - other.getPixel(i, j);
+					diff += pixDiff.getAvgIntensity();
+				}
+			}
+			return diff;
+		}
+
+		T assignAll(const unsigned int y, const unsigned int x, PrecisionType t) const {
+			return T(t);
+		}
+
+		imageGrid<T> trainingClassifier() const {
+			PrecisionType avgIntensity = getAverageImageIntensity();
+			PrecisionType newVal = 0;
+
+			PrecisionType candidateLabels[] = { 0, 128, 255 };
+			for (unsigned i = 0; i < sizeof(candidateLabels)/sizeof(PrecisionType); i++) {
+				if (abs(avgIntensity - newVal) >= abs(avgIntensity - candidateLabels[i])) {
+					newVal = candidateLabels[i];
+				}
+			}
+
+			std::function<T(const unsigned int, const unsigned int)> assign = 
+				std::bind(
+					&imageGrid<T>::assignAll,
+					this,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					newVal
+				);
+			return transformGrid(assign);
+		}
+
 		//will write failure to bool if non-null pointer and if subimage grid size-fails
 		static imageGrid<T> fromSubImageGrid(const Array2D<imageGrid<T>>& imageMatrix, bool* success = NULL) {
 			bool checkDimensions = true;

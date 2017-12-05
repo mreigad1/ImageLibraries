@@ -56,7 +56,7 @@ namespace assignment5 {
 		const char* frame_1 = argv[1];
 		const char* frame_2 = argv[2];
 
-		std::cout << "\n\nBeginning assignment 5\n";
+		std::cout << "\n\nBeginning assignment 5 Part 2\n";
 		std::cout << std::flush;
 
 		//setup all displayable images
