@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <map>
 
 bool sortByX(coordinate c1, coordinate c2) {
 	return c1.x < c2.x;
@@ -55,9 +56,6 @@ template <typename PixType> class motionVectorMap {
 					const int med_x = blockCoords[mdPt].x;
 					std::sort(blockCoords.begin(), blockCoords.end(), sortByY);
 					const int med_y = blockCoords[mdPt].y;
-
-					// int med_x = 0;
-					// int med_y = 0;
 
 					coordinate medianVec(med_x, med_y);
 					auto& cd = medianVec;
