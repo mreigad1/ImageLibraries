@@ -231,33 +231,12 @@ template <typename T> class imageGrid {
 					diff += pixDiff.getAvgIntensity();
 				}
 			}
+			diff /= (min_h * min_w);
 			return diff;
 		}
 
 		T assignAll(const unsigned int y, const unsigned int x, PrecisionType t) const {
 			return T(t);
-		}
-
-		imageGrid<T> trainingClassifier() const {
-			PrecisionType avgIntensity = getAverageImageIntensity();
-			PrecisionType newVal = 0;
-
-			PrecisionType candidateLabels[] = { 0, 128, 255 };
-			for (unsigned i = 0; i < sizeof(candidateLabels)/sizeof(PrecisionType); i++) {
-				if (abs(avgIntensity - newVal) >= abs(avgIntensity - candidateLabels[i])) {
-					newVal = candidateLabels[i];
-				}
-			}
-
-			std::function<T(const unsigned int, const unsigned int)> assign = 
-				std::bind(
-					&imageGrid<T>::assignAll,
-					this,
-					std::placeholders::_1,
-					std::placeholders::_2,
-					newVal
-				);
-			return transformGrid(assign);
 		}
 
 		//will write failure to bool if non-null pointer and if subimage grid size-fails

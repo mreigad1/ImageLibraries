@@ -6,6 +6,7 @@
 #include "motionVectorMap.hpp"
 #include "block.h"
 #include "histogram.hpp"
+#include "GreyscaleClassification.h"
 #include <vector>
 #include <iomanip>
 
@@ -15,29 +16,6 @@ using namespace cv;
 typedef GreyscalePix::pixelGreyscale Grey_P;
 
 namespace assignment5 {
-
-	const mask& structuringElement() {
-		static PrecisionType arr[] = {
-			0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,
-			0,	0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,	0,
-			0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,
-			0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,
-			0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,
-			0,	0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,	0,
-			0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,
-		};
-		static mask um(15, arr);
-		return um;
-	}
-
 	int driver(int argc, char **argv) {
 		//ensure correct args
 		ASSERT(2 == argc);
@@ -48,6 +26,8 @@ namespace assignment5 {
 
 		//setup all displayable images
 		Mat colorFrame1 = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat M1_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+
 
 		//ensure all images are valid
 		ASSERT(nullptr != colorFrame1.data);
@@ -62,19 +42,17 @@ namespace assignment5 {
 
 		//get array of 4x4 subimages
 		auto subImages = colorGrid1.subImages(4);
-		auto processedSubs = subImages;
-		for (unsigned  i = 0; i < subImages.Height()/2; i++) {
-			for (unsigned j = 0; j < subImages.Width(); j++) {
-				processedSubs[i][j] = subImages[i][j].trainingClassifier();
-			}
-		}
+		auto classEngine = NearestNeighbor(subImages);
 
-		colorGrid1 = imageGrid<Grey_P>::fromSubImageGrid(processedSubs);
+		auto processedSubs = classEngine.getN1();
 
-		colorGrid1.commitImageGrid ((Grey_P*)(&colorFrame1.data[0]));
+		imageGrid<Grey_P> M1 = imageGrid<Grey_P>::fromSubImageGrid(processedSubs);
+
+		M1.commitImageGrid ((Grey_P*)(&M1_Frame.data[0]));
 
 		//display results
-		imshow("Frame 1 Image", colorFrame1);
+		imshow("Original Image", colorFrame1);
+		imshow("Trained Image", M1_Frame);
 
 		//Display loop
 		bool loop = true;
