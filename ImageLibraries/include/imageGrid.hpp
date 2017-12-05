@@ -79,6 +79,27 @@ template <typename T> class imageGrid {
 			return img[y][x];
 		}
 
+		T getReassembledPixel(const unsigned int y, const int x, const imageGrid<T>& result, const imageGrid<T>& frame0, const Array2D<coordinate>& translations) const {
+			T rv = result.getPixel(y, x) + frame0.getPixel(y + translations[y][x].y, x + translations[y][x].x);
+			return rv;
+		}
+
+		static imageGrid<T> reassembleMotion(const imageGrid<T>& result, const imageGrid<T>& frame0, const Array2D<coordinate>& translations) {
+			imageGrid<T> rv = result;
+			std::function<T(const unsigned int, const unsigned int)> inverseResult = 
+				std::bind(
+					&imageGrid<T>::getReassembledPixel,
+					&rv,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					result,
+					frame0,
+					translations
+				);
+			rv = rv.transformGrid(inverseResult);
+			return rv;
+		}
+
 		#define ARITH_TYPE decltype(T().Arithmetical())
 			imageGrid<ARITH_TYPE> cdf() const {
 				imageGrid<ARITH_TYPE> rv(*this);

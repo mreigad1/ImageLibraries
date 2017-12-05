@@ -194,7 +194,9 @@ Assignment5_Part1: build_dir move_Assignment5
 		$(BUILD_DIR)/pixelRGB.cpp $(BUILD_DIR)/arithmeticalRGB.cpp             \
 		$(BUILD_DIR)/pixelHSI.cpp $(BUILD_DIR)/arithmeticalHSI.cpp             \
 		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/Assignment5
-	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/pong1.bmp $(ASSETS_DIR)/pong2.bmp
+	./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/Pong1.bmp $(ASSETS_DIR)/Pong2.bmp
+	#./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/Tennis1.bmp $(ASSETS_DIR)/Tennis2.bmp
+	#./$(TEST_DIR)/Assignment5 $(ASSETS_DIR)/doge.png $(ASSETS_DIR)/doge2.png
 	rm $(TEST_DIR)/Assignment5
 
 move_tests:
