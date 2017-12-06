@@ -207,8 +207,8 @@ class NearestNeighbor {
 
 						//write all pixels with training label
 						trainedImg[i][j] = trainedImg[i][j].transformGrid(assign);
+					}
 				}
-			}
 		}
 
 		NearestNeighbor(const NearestNeighbor& other) :
@@ -276,6 +276,45 @@ class NearestNeighbor {
 			return transformLowerFromUpper(doN1);
 		}
 
+		Array2D<imageGrid<Grey_P>> getT1() const {
+			Array2D<imageGrid<Grey_P>> rv = trainedImg;
+
+			//convenience variable
+			const unsigned hOff = rv.Height() / 2;
+
+			//for each subimage perform training
+			for (unsigned  i = hOff; i < 2 * hOff; i++) {
+				for (unsigned j = 0; j < rv.Width(); j++) {
+
+					//default failure
+					bool success = false;
+
+					//get average intensity
+					PrecisionType avgLvl = rv[i][j].getAverageImageIntensity();
+
+					//get training label
+					PrecisionType pix = classifier.getLabel(avgLvl, &success);
+
+					//assert success
+					ASSERT(success);
+
+					//create transform to write training labels in subimage
+					std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
+						std::bind(
+							&imageGrid<Grey_P>::assignAll,
+							&rv[i][j],
+							std::placeholders::_1,
+							std::placeholders::_2,
+							pix
+						);
+
+					//write all pixels with training label
+					rv[i][j] = rv[i][j].transformGrid(assign);
+				}
+			}
+			return rv;
+		}
+
 		Array2D<imageGrid<Grey_P>> transformLowerFromUpper(std::function<imageGrid<Grey_P>(const imageGrid<Grey_P>&)> func) const {
 
 			//copy entire trained image
@@ -323,7 +362,7 @@ class NearestNeighbor {
 		}
 
 
-	private:
+	protected:
 
 		imageGrid<Grey_P> writeFromNeighborTrainingLabel(const imageGrid<Grey_P>& src) const {
 
@@ -415,3 +454,102 @@ class NearestNeighbor {
 		const Array2D<imageGrid<Grey_P>>& origImg;
 };
 
+class kMeans : public NearestNeighbor {
+	public:
+		kMeans(const Array2D<imageGrid<Grey_P>>& image) :
+			NearestNeighbor(image),
+			clusters(image.Height(), image.Width()),
+			intensities(image.Height(), image.Width()) {
+				trainedImg = origImg;
+
+				for (unsigned  i = 0; i < trainedImg.Height(); i++) {
+					for (unsigned j = 0; j < trainedImg.Width(); j++) {
+						clusters[i][j] = -1;
+					}
+				}
+
+				const int numGreyLevels = 3;
+				long long memberCounts[numGreyLevels] = {0,0,0};
+				PrecisionType greyLevels[numGreyLevels] = { 255, 128, 0 };
+				PrecisionType greySums[numGreyLevels] = { 0, 0, 0 };
+
+				//convenience variable
+				const unsigned hOff = trainedImg.Height() / 2;
+
+				//set intensity of each sub image
+				for (unsigned  i = 0; i < hOff; i++) {
+					for (unsigned j = 0; j < trainedImg.Width(); j++) {
+						intensities[i][j] = origImg[i][j].getAverageImageIntensity();
+					}
+				}
+
+				//for each count of means
+				const int means = 10;
+				for (int meansCount = 0; meansCount < means; meansCount++) {
+
+					//for each block
+					//assign nearest cluster and determine averages
+					for (unsigned  i = 0; i < hOff; i++) {
+						for (unsigned j = 0; j < trainedImg.Width(); j++) {
+
+							//initialize distance
+							clusters[i][j] = 0;
+							PrecisionType distance = abs(greyLevels[0] - intensities[i][j]);
+							//distance *= distance;
+
+							//for each remaining cluster
+							for (int k = 1; k < numGreyLevels; k++) {
+
+								//candidate distance
+								PrecisionType tmpDist = abs(greyLevels[k] - intensities[i][j]);
+								//tmpDist *= tmpDist;
+
+								//if better fit for that cluster then set there
+								if (distance >= tmpDist) {
+									clusters[i][j] = k;
+									distance = tmpDist;
+								}
+							}
+
+							//move block to that cluster, increase count & average
+							memberCounts[clusters[i][j]]++;
+							greySums[clusters[i][j]] += intensities[i][j];
+						}
+					}
+
+					//figure out gray scale average
+					if ((meansCount + 1) != means) {
+						for (int k = 0; k < numGreyLevels; k++) {
+							greyLevels[k] = greySums[k] / memberCounts[k];
+
+							//wipe counts & averages
+							greySums[k] = 0;
+							memberCounts[k] = 0;
+						}
+					}
+				}
+
+				//for each subimage perform training
+				for (unsigned  i = 0; i < hOff; i++) {
+					for (unsigned j = 0; j < trainedImg.Width(); j++) {
+						//create transform to write training labels in subimage
+						std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
+							std::bind(
+								&imageGrid<Grey_P>::assignAll,
+								&trainedImg[i][j],
+								std::placeholders::_1,
+								std::placeholders::_2,
+								greyLevels[clusters[i][j]]
+							);
+
+						//write all pixels with training label
+						trainedImg[i][j] = trainedImg[i][j].transformGrid(assign);
+					}
+				}
+
+		}
+
+	protected:
+		Array2D<int> clusters;
+		Array2D<PrecisionType> intensities;
+};

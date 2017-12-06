@@ -17,19 +17,6 @@ namespace assignment5 {
 
 	const mask& structuringElement() {
 		static PrecisionType arr[] = {
-			// 0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,
-			// 0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,
-			// 0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,
-			// 0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,
-			// 0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,
-			// 0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,
 			0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,
 			0,	0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,	0,
 			0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,
@@ -92,7 +79,7 @@ namespace assignment5 {
 		//display results
 		imshow("Frame 1 Image", colorFrame1);
 		imshow("Frame 2 Image", colorFrame2);
-		imshow( "Motion Image", motionFrame);
+		imshow( "Motion Compensated Image", motionFrame);
 		imshow( "Difference Image", diffFrame);
 		imshow( "Reconstructed Image", reconstructedFrame);
 

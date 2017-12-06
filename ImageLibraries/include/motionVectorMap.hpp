@@ -40,6 +40,7 @@ template <typename PixType> class motionVectorMap {
 
 			//for each sub block in image
 			for (unsigned int i = 0; i < translationImage.Height(); i += blockWidth) {
+				std::cout << "imageRow[" << i << "] = {\n\t";
 				for (unsigned int j = 0; j < translationImage.Width(); j += blockWidth) {
 
 					//get container of coordinate translations
@@ -59,7 +60,9 @@ template <typename PixType> class motionVectorMap {
 
 					coordinate medianVec(med_x, med_y);
 					auto& cd = medianVec;
-					std::cout << "(" << cd.x << "," << cd.y << ")";
+
+					static long long lineCount = 0;
+					std::cout << "(" << cd.x << "," << cd.y << ")" << ((++lineCount % 10) ? (" ") : (j + 1 == translationImage.Width()) ? ("\n") : ("\n\t"));
 
 					//overwrite block vector with median translation vector
 					for (int sub_i = 0; sub_i < blockWidth && (i + sub_i) < translationImage.Height(); sub_i++) {
@@ -68,8 +71,7 @@ template <typename PixType> class motionVectorMap {
 						}
 					}
 				}
-
-				std::cout << std::endl << std::endl;
+				std::cout << "}" << std::endl << std::endl;
 			}
 			return translationImage;
 		}

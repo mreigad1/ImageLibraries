@@ -221,6 +221,20 @@ template <typename T> class imageGrid {
 			return rv;
 		}
 
+		PrecisionType getNumDiffPixels(const imageGrid<T>& other) const {
+			int min_h = std::min(Height(), other.Height());
+			int min_w = std::min(Width(), other.Width());
+			PrecisionType diff = 0;
+			for (int i = 0; i < min_h; i++) {
+				for (int j = 0; j < min_w; j++) {
+					if (abs(getPixel(i, j).getAvgIntensity() - other.getPixel(i, j).getAvgIntensity()) != 0) {
+						diff++;
+					}
+				}
+			}
+			return diff;
+		}
+
 		PrecisionType getAverageDifference(const imageGrid<T>& other) const {
 			int min_h = std::min(Height(), other.Height());
 			int min_w = std::min(Width(), other.Width());

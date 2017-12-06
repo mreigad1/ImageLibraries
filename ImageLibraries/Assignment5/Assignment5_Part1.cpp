@@ -31,6 +31,8 @@ namespace assignment5 {
 		Mat N2_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
 		Mat N3_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
 		Mat N4_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat T1_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat K1_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
 
 		//ensure all images are valid
 		ASSERT(nullptr != colorFrame1.data);
@@ -41,10 +43,12 @@ namespace assignment5 {
 		//construct imageGrids
 		imageGrid<Grey_P> colorGrid1(colorFrame1.rows, colorFrame1.step / 1, (Grey_P*)(&colorFrame1.data[0]));
 
-		colorGrid1 = histogramProcessor<Grey_P>(colorGrid1).histogramCorrection();
+		//colorGrid1 = histogramProcessor<Grey_P>(colorGrid1).histogramCorrection();
+
+		const int learningVectorSize = 4;
 
 		//get array of 4x4 subimages
-		auto subImages = colorGrid1.subImages(4);
+		auto subImages = colorGrid1.subImages(learningVectorSize);
 		//auto classEngine = NearestNeighbor(subImages);
 
 		auto processedM1 = NearestNeighbor(subImages).getM1();
@@ -52,18 +56,27 @@ namespace assignment5 {
 		auto processedN2 = NearestNeighbor(subImages).getN2();
 		auto processedN3 = NearestNeighbor(subImages).getN3();
 		auto processedN4 = NearestNeighbor(subImages).getN4();
+		auto processedT1 = NearestNeighbor(subImages).getT1();
+		auto processedK1 =          kMeans(subImages).getM1();
 
 		imageGrid<Grey_P> M1 = imageGrid<Grey_P>::fromSubImageGrid(processedM1);
 		imageGrid<Grey_P> N1 = imageGrid<Grey_P>::fromSubImageGrid(processedN1);
 		imageGrid<Grey_P> N2 = imageGrid<Grey_P>::fromSubImageGrid(processedN2);
 		imageGrid<Grey_P> N3 = imageGrid<Grey_P>::fromSubImageGrid(processedN3);
 		imageGrid<Grey_P> N4 = imageGrid<Grey_P>::fromSubImageGrid(processedN4);
+		imageGrid<Grey_P> T1 = imageGrid<Grey_P>::fromSubImageGrid(processedT1);
+		imageGrid<Grey_P> K1 = imageGrid<Grey_P>::fromSubImageGrid(processedK1);
 
 		M1.commitImageGrid ((Grey_P*)(&M1_Frame.data[0]));
 		N1.commitImageGrid ((Grey_P*)(&N1_Frame.data[0]));
 		N2.commitImageGrid ((Grey_P*)(&N2_Frame.data[0]));
 		N3.commitImageGrid ((Grey_P*)(&N3_Frame.data[0]));
 		N4.commitImageGrid ((Grey_P*)(&N4_Frame.data[0]));
+		T1.commitImageGrid ((Grey_P*)(&T1_Frame.data[0]));
+		K1.commitImageGrid ((Grey_P*)(&K1_Frame.data[0]));
+
+		const PrecisionType numDiffSubImages = T1.getNumDiffPixels(N1) / (T1.Height() * T1.Width());
+		std::cout << "Between Trained T1 and Tested N1, error rate E = " << numDiffSubImages * 200 << "%\n"; //this is 200 because its percentage and only half of image is trained
 
 		//display results
 		imshow("Original Image", colorFrame1);
@@ -72,6 +85,8 @@ namespace assignment5 {
 		imshow("Testing Image (N2)", N2_Frame);
 		imshow("Testing Image (N3)", N3_Frame);
 		imshow("Testing Image (N4)", N4_Frame);
+		imshow("Testing Image (T1)", T1_Frame);
+		imshow("K-Means Image (K1)", K1_Frame);
 
 		//Display loop
 		bool loop = true;
