@@ -227,8 +227,7 @@ template <typename T> class imageGrid {
 			PrecisionType diff = 0;
 			for (int i = 0; i < min_h; i++) {
 				for (int j = 0; j < min_w; j++) {
-					T pixDiff = getPixel(i, j) - other.getPixel(i, j);
-					diff += pixDiff.getAvgIntensity();
+					diff += abs(getPixel(i, j).getAvgIntensity() - other.getPixel(i, j).getAvgIntensity());
 				}
 			}
 			diff /= (min_h * min_w);

@@ -27,7 +27,10 @@ namespace assignment5 {
 		//setup all displayable images
 		Mat colorFrame1 = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
 		Mat M1_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
-
+		Mat N1_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat N2_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat N3_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat N4_Frame = imread(frame_1, CV_LOAD_IMAGE_GRAYSCALE);
 
 		//ensure all images are valid
 		ASSERT(nullptr != colorFrame1.data);
@@ -42,17 +45,33 @@ namespace assignment5 {
 
 		//get array of 4x4 subimages
 		auto subImages = colorGrid1.subImages(4);
-		auto classEngine = NearestNeighbor(subImages);
+		//auto classEngine = NearestNeighbor(subImages);
 
-		auto processedSubs = classEngine.getN1();
+		auto processedM1 = NearestNeighbor(subImages).getM1();
+		auto processedN1 = NearestNeighbor(subImages).getN1();
+		auto processedN2 = NearestNeighbor(subImages).getN2();
+		auto processedN3 = NearestNeighbor(subImages).getN3();
+		auto processedN4 = NearestNeighbor(subImages).getN4();
 
-		imageGrid<Grey_P> M1 = imageGrid<Grey_P>::fromSubImageGrid(processedSubs);
+		imageGrid<Grey_P> M1 = imageGrid<Grey_P>::fromSubImageGrid(processedM1);
+		imageGrid<Grey_P> N1 = imageGrid<Grey_P>::fromSubImageGrid(processedN1);
+		imageGrid<Grey_P> N2 = imageGrid<Grey_P>::fromSubImageGrid(processedN2);
+		imageGrid<Grey_P> N3 = imageGrid<Grey_P>::fromSubImageGrid(processedN3);
+		imageGrid<Grey_P> N4 = imageGrid<Grey_P>::fromSubImageGrid(processedN4);
 
 		M1.commitImageGrid ((Grey_P*)(&M1_Frame.data[0]));
+		N1.commitImageGrid ((Grey_P*)(&N1_Frame.data[0]));
+		N2.commitImageGrid ((Grey_P*)(&N2_Frame.data[0]));
+		N3.commitImageGrid ((Grey_P*)(&N3_Frame.data[0]));
+		N4.commitImageGrid ((Grey_P*)(&N4_Frame.data[0]));
 
 		//display results
 		imshow("Original Image", colorFrame1);
-		imshow("Trained Image", M1_Frame);
+		imshow("Trained Image (M1)", M1_Frame);
+		imshow("Testing Image (N1)", N1_Frame);
+		imshow("Testing Image (N2)", N2_Frame);
+		imshow("Testing Image (N3)", N3_Frame);
+		imshow("Testing Image (N4)", N4_Frame);
 
 		//Display loop
 		bool loop = true;

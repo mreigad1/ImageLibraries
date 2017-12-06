@@ -12,7 +12,7 @@ typedef GreyscalePix::pixelGreyscale Grey_P;
 
 class GreyscaleClass {
 	private:
-		unsigned counter;
+		long long counter;
 		PrecisionType totalSum;
 		const PrecisionType lower;
 		const bool lowerInclusive;
@@ -26,6 +26,16 @@ class GreyscaleClass {
 
 		bool beneathHigh(const PrecisionType p) const {
 			return (p < upper) || (upperInclusive && p == upper);
+		}
+
+		GreyscaleClass():
+			counter(0),
+			totalSum(0),
+			lower(0),
+			lowerInclusive(0),
+			upper(0),
+			upperInclusive(0),
+			classLabel(0) {
 		}
 
 	public:
@@ -56,13 +66,12 @@ class GreyscaleClass {
 		}
 
 		bool insertInClass(const PrecisionType p) {
-			if (!inClass(p)) {
-				return false;
-			} else {
-				counter++;
-				totalSum += p;
+			if (inClass(p)) {
+				this->counter++;
+				this->totalSum += p;
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 		PrecisionType getLabel() const {
@@ -76,19 +85,26 @@ class GreyscaleClass {
 
 class GreyscaleClassification {
 
-	std::vector<GreyscaleClass> pClasses;
+	std::vector<GreyscaleClass*> pClasses;
 
 	public:
 		GreyscaleClassification() {
-			pClasses.push_back(GreyscaleClass(   0, true, 125, false,   0 ));
-			pClasses.push_back(GreyscaleClass( 125, true, 175, false, 128 ));
-			pClasses.push_back(GreyscaleClass( 175, true, 255,  true, 255 ));
+			pClasses.push_back(new GreyscaleClass(   0, true, 125, false,   0 ));
+			pClasses.push_back(new GreyscaleClass( 125, true, 175, false, 128 ));
+			pClasses.push_back(new GreyscaleClass( 175, true, 255,  true, 255 ));
+		}
+
+		~GreyscaleClassification() {
+			for (auto ptrItem : pClasses) {
+				delete ptrItem;
+			}
 		}
 
 		PrecisionType addAndReturnLabel(const PrecisionType& pix, bool* const success = NULL) {
 			bool wasSuccess = false;
 			PrecisionType label = 0;
-			for (auto gClass : pClasses) {
+			for (auto ptrItem : pClasses) {
+				auto& gClass = *ptrItem;
 				if (gClass.insertInClass(pix)) {
 					label = gClass.getLabel();
 					wasSuccess = true;
@@ -96,9 +112,14 @@ class GreyscaleClassification {
 				}
 			}
 
+			if (!wasSuccess) {
+				std::cout << "did not find " << pix << " in " << __PRETTY_FUNCTION__ << std::endl;
+			}
+
 			if (NULL != success) {
 				*success = wasSuccess;
 			}
+			ASSERT(wasSuccess);
 			return label;
 		}
 
@@ -106,12 +127,40 @@ class GreyscaleClassification {
 			bool wasSuccess = false;
 			PrecisionType avg = 0;
 
-			for (auto gClass : pClasses) {
+			for (auto ptrItem : pClasses) {
+				auto& gClass = *ptrItem;
 				if (gClass.inClass(pix)) {
 					avg = gClass.getClassAvgIntensity();
 					wasSuccess = true;
 					break;
 				}
+			}
+
+			if (!wasSuccess) {
+				std::cout << "did not find " << pix << " in " << __PRETTY_FUNCTION__ << std::endl;
+			}
+
+			if (NULL != success) {
+				*success = wasSuccess;
+			}
+			return avg;
+		}
+
+		PrecisionType getLabel(const PrecisionType& pix, bool* const success = NULL) const {
+			bool wasSuccess = false;
+			PrecisionType avg = 0;
+
+			for (auto ptrItem : pClasses) {
+				auto& gClass = *ptrItem;
+				if (gClass.inClass(pix)) {
+					avg = gClass.getLabel();
+					wasSuccess = true;
+					break;
+				}
+			}
+
+			if (!wasSuccess) {
+				std::cout << "did not find " << pix << " in " << __PRETTY_FUNCTION__ << std::endl;
 			}
 
 			if (NULL != success) {
@@ -123,40 +172,50 @@ class GreyscaleClassification {
 
 class NearestNeighbor {
 	public:
-		NearestNeighbor(const Array2D<imageGrid<Grey_P>>& image) : classifier(), trainedImg(image), origImg(image) {
-			//convenience variable
-			const unsigned hOff = trainedImg.Height() / 2;
+		NearestNeighbor(const Array2D<imageGrid<Grey_P>>& image) :
+			classifier(),
+			trainedImg(image),
+			origImg(image) {
+				//convenience variable
+				const unsigned hOff = trainedImg.Height() / 2;
 
-			//for each subimage perform training
-			for (unsigned  i = 0; i < hOff; i++) {
-				for (unsigned j = 0; j < trainedImg.Width(); j++) {
+				//for each subimage perform training
+				for (unsigned  i = 0; i < hOff; i++) {
+					for (unsigned j = 0; j < trainedImg.Width(); j++) {
 
-					//default failure
-					bool success = false;
+						//default failure
+						bool success = false;
 
-					//get average intensity
-					PrecisionType avgLvl = trainedImg[i][j].getAverageImageIntensity();
+						//get average intensity
+						PrecisionType avgLvl = trainedImg[i][j].getAverageImageIntensity();
 
-					//get training label
-					PrecisionType pix = classifier.addAndReturnLabel(avgLvl, &success);
+						//get training label
+						PrecisionType pix = classifier.addAndReturnLabel(avgLvl, &success);
 
-					//assert success
-					ASSERT(success);
+						//assert success
+						ASSERT(success);
 
-					//create transform to write training labels in subimage
-					std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
-						std::bind(
-							&imageGrid<Grey_P>::assignAll,
-							&trainedImg[i][j],
-							std::placeholders::_1,
-							std::placeholders::_2,
-							pix
-						);
+						//create transform to write training labels in subimage
+						std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
+							std::bind(
+								&imageGrid<Grey_P>::assignAll,
+								&trainedImg[i][j],
+								std::placeholders::_1,
+								std::placeholders::_2,
+								pix
+							);
 
-					//write all pixels with training label
-					trainedImg[i][j] = trainedImg[i][j].transformGrid(assign);
+						//write all pixels with training label
+						trainedImg[i][j] = trainedImg[i][j].transformGrid(assign);
 				}
 			}
+		}
+
+		NearestNeighbor(const NearestNeighbor& other) :
+			classifier(other.classifier),
+			trainedImg(other.trainedImg),
+			origImg(other.origImg) 
+		{
 		}
 
 		Array2D<imageGrid<Grey_P>> getM1() const {
@@ -170,6 +229,45 @@ class NearestNeighbor {
 			std::function<imageGrid<Grey_P>(const imageGrid<Grey_P>&)> doN1 = 
 				std::bind(
 					&NearestNeighbor::writeFromNeighborTrainingLabel,
+					this,
+					std::placeholders::_1
+				);
+
+			//perform transform with writeFromNeighborTrainingLabel
+			return transformLowerFromUpper(doN1);
+		}
+
+		Array2D<imageGrid<Grey_P>> getN2() const {
+			//create function to write with neighbor training label
+			std::function<imageGrid<Grey_P>(const imageGrid<Grey_P>&)> doN1 = 
+				std::bind(
+					&NearestNeighbor::writeNeighborData,
+					this,
+					std::placeholders::_1
+				);
+
+			//perform transform with writeFromNeighborTrainingLabel
+			return transformLowerFromUpper(doN1);
+		}
+
+		Array2D<imageGrid<Grey_P>> getN3() const {
+			//create function to write with neighbor training label
+			std::function<imageGrid<Grey_P>(const imageGrid<Grey_P>&)> doN1 = 
+				std::bind(
+					&NearestNeighbor::writeFromNeighborAvgGreyscale,
+					this,
+					std::placeholders::_1
+				);
+
+			//perform transform with writeFromNeighborTrainingLabel
+			return transformLowerFromUpper(doN1);
+		}
+
+		Array2D<imageGrid<Grey_P>> getN4() const {
+			//create function to write with neighbor training label
+			std::function<imageGrid<Grey_P>(const imageGrid<Grey_P>&)> doN1 = 
+				std::bind(
+					&NearestNeighbor::writeFromNeighborAVGClass,
 					this,
 					std::placeholders::_1
 				);
@@ -199,6 +297,9 @@ class NearestNeighbor {
 					for (unsigned  n_i = 0; n_i < hOff; n_i++) {
 						for (unsigned n_j = 0; n_j < rv.Width(); n_j++) {
 
+							//short circuit if perfect neighbor match
+							if (diff == 0) break;
+
 							//get neighbor distance
 							PrecisionType tmpDiff = origImg[i][j].getAverageDifference(origImg[n_i][n_j]);
 
@@ -213,7 +314,7 @@ class NearestNeighbor {
 					}
 
 					//overwrite subimage with transformation from candidate neighbor
-					rv[i][j] = func(rv[n_y][n_x]);
+					rv[i][j] = func(origImg[n_y][n_x]);
 				}
 			}
 
@@ -225,6 +326,62 @@ class NearestNeighbor {
 	private:
 
 		imageGrid<Grey_P> writeFromNeighborTrainingLabel(const imageGrid<Grey_P>& src) const {
+
+			//default failure
+			bool wasSuccess = false;
+
+			//copy input image
+			imageGrid<Grey_P> rv = src;
+
+			//get label from average intensity
+			PrecisionType avgPix = src.getAverageImageIntensity();
+			PrecisionType label = classifier.getLabel(avgPix, &wasSuccess);
+
+			//assert success
+			ASSERT(wasSuccess);
+
+			//assignment function to transform by
+			std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
+				std::bind(
+					&imageGrid<Grey_P>::assignAll,
+					&rv,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					label
+				);
+
+			//perform image transformation of reassignment
+			return rv.transformGrid(assign);
+		}
+
+		imageGrid<Grey_P> writeFromNeighborAvgGreyscale(const imageGrid<Grey_P>& src) const {
+
+			//copy input image
+			imageGrid<Grey_P> rv = src;
+
+			//get label from average intensity
+			PrecisionType avgPix = src.getAverageImageIntensity();
+			PrecisionType label = avgPix;
+
+			//assignment function to transform by
+			std::function<Grey_P(const unsigned int, const unsigned int)> assign = 
+				std::bind(
+					&imageGrid<Grey_P>::assignAll,
+					&rv,
+					std::placeholders::_1,
+					std::placeholders::_2,
+					label
+				);
+
+			//perform image transformation of reassignment
+			return rv.transformGrid(assign);
+		}
+
+		imageGrid<Grey_P> writeNeighborData(const imageGrid<Grey_P>& src) const {
+			return src;
+		}
+
+		imageGrid<Grey_P> writeFromNeighborAVGClass(const imageGrid<Grey_P>& src) const {
 
 			//default failure
 			bool wasSuccess = false;
@@ -255,6 +412,6 @@ class NearestNeighbor {
 
 		GreyscaleClassification classifier;
 		Array2D<imageGrid<Grey_P>> trainedImg;
-		Array2D<imageGrid<Grey_P>> origImg;
+		const Array2D<imageGrid<Grey_P>>& origImg;
 };
 
