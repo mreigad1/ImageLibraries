@@ -38,6 +38,8 @@ Assignment4:	Assignment4_Part1	\
 Assignment5:	Assignment5_Part1	\
 				Assignment5_Part2	\
 
+Final:			Final_Project		\
+
 perform_test: 	debugTest			\
 				Array2DTest			\
 				ByteIntensityTest	\
@@ -211,6 +213,15 @@ Assignment5_Part2: build_dir move_Assignment5
 	#./$(TEST_DIR)/Assignment5_Part2 $(ASSETS_DIR)/doge.png $(ASSETS_DIR)/doge2.png
 	rm $(TEST_DIR)/Assignment5_Part2
 
+Final_Project: build_dir move_Final
+	g++ $(BUILD_DIR)/Demo.cpp                                                  \
+		$(BUILD_DIR)/diffCalculator.cpp                                        \
+		$(BUILD_FLAGS) ${CVOPTIONS} -o $(TEST_DIR)/finalProject
+	./getSnap.sh $(ASSETS_DIR)/snap1.jpg $(ASSETS_DIR)/snap2.jpg
+	RESULT=`./$(TEST_DIR)/finalProject $(ASSETS_DIR)/snap1.jpg $(ASSETS_DIR)/snap2.jpg`
+	echo "RESULT -> ${RESULT}"
+	rm $(TEST_DIR)/finalProject
+
 move_tests:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(TEST_DIR)
@@ -235,6 +246,10 @@ move_Assignment4:
 move_Assignment5:
 	mkdir -p $(BUILD_DIR)
 	cp ImageLibraries/Assignment5/* $(BUILD_DIR)
+
+move_Final:
+	mkdir -p $(BUILD_DIR)
+	cp ImageLibraries/FinalProject/* $(BUILD_DIR)
 
 build_dir:
 	mkdir -p $(BUILD_DIR)
